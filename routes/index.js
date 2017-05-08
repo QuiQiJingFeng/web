@@ -4,15 +4,6 @@ var md5 = require('md5');
 let mysql_pool = require('./mysql_pool.js');
 let COOKIE_TIMEOUT = 36000000;
 
-var responseHead = {
-    'Content-Type': 'text/plain',
-    'Cache-Control': 'no-cache',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, PATCH, DELETE',
-    'Access-Control-Allow-Headers': 'X-Requested-With,content-type',
-    'Access-Control-Allow-Credentials': true
-};
-
-
 /* GET home page. */
 router.route('/')
     .get(function(req, res) {
@@ -64,12 +55,7 @@ router.post('/login', function(req, res) {
                 res.cookie('group', data.group_id);
             }
 
-            if (req.headers.origin) {
-                responseHead['Access-Control-Allow-Origin'] = req.headers.origin;
-            }
-
-            res.writeHead(200, responseHead);
-            res.write(JSON.stringify(response));
+            res.json(JSON.stringify(response));
             res.end();
         });
     }else{
@@ -84,16 +70,10 @@ router.post('/register', function(req, res) {
         if (!account || !password || !account.trim() || !password.trim()) return;
         let response = {};
         mysql_pool.GetAccount(account, function(value){
-                
-                if (req.headers.origin) {
-                    responseHead['Access-Control-Allow-Origin'] = req.headers.origin;
-                }
                 data = value[0];
                 if(data) {
-
-                    res.writeHead(200, responseHead);
                     response.result = "account_exist";
-                    res.write(JSON.stringify(response));
+                    res.json(JSON.stringify(response));
                     res.end();
                 }else {
                     mysql_pool.RegisterAccount(account, md5(password),function(success) {
@@ -102,8 +82,7 @@ router.post('/register', function(req, res) {
                         }else {
                             response.result = "failer";
                         }
-                        res.writeHead(200, responseHead);
-                        res.write(JSON.stringify(response));
+                        res.json(JSON.stringify(response));
                         res.end();
                     });
                 }
