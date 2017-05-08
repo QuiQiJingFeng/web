@@ -55,7 +55,7 @@ router.post('/login', function(req, res) {
                 res.cookie('group', data.group_id);
             }
 
-            res.json(JSON.stringify(response));
+            res.write(JSON.stringify(response));
             res.end();
         });
     }else{
@@ -73,7 +73,7 @@ router.post('/register', function(req, res) {
                 data = value[0];
                 if(data) {
                     response.result = "account_exist";
-                    res.json(JSON.stringify(response));
+                    res.write(JSON.stringify(response));
                     res.end();
                 }else {
                     mysql_pool.RegisterAccount(account, md5(password),function(success) {
@@ -82,7 +82,8 @@ router.post('/register', function(req, res) {
                         }else {
                             response.result = "failer";
                         }
-                        res.json(JSON.stringify(response));
+                        console.log(JSON.stringify(response));
+                        res.write(JSON.stringify(response));
                         res.end();
                     });
                 }
