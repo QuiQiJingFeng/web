@@ -20,10 +20,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 //express.static will pointer static resources
-app.use(express.static(path.join(__dirname, 'public')));
-
 app.use(function (req, res, next) {
-
     res.setHeader('Content-Type', 'text/plain');
 
     // Website you wish to allow to connect
@@ -42,6 +39,8 @@ app.use(function (req, res, next) {
     // Pass to next layer of middleware
     next();
 });
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
 
