@@ -21,7 +21,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 //express.static will pointer static resources
 app.use(function (req, res, next) {
-    res.setHeader('Content-Type', 'text/plain');
 
     // Website you wish to allow to connect
     res.setHeader('Access-Control-Allow-Origin', '*');

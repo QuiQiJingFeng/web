@@ -9,12 +9,17 @@ let constant = require("./constant.js");
 router.route('/')
     .get(function(req, res) {
         if (req.cookies.login) {
-            res.redirect('/index_page');
+            res.redirect('/index');
         } else {
-            res.redirect('/login_page');
+            res.redirect('/login');
         }
     });
 
+router.get('/login', function(req, res){
+    res.render('login.jade', {title:'QueQiJingFeng Console'});
+});   
+
+/*===================================LOGIC=====================================*/
 /*
     @account  账户
     @password 密码
@@ -42,6 +47,7 @@ router.post('/login', function(req, res) {
         if(check){
             response.result = 'success';
         }
+        res.setHeader('Content-Type', 'text/plain');
         res.write(JSON.stringify(response));
         res.end();
     });
@@ -82,6 +88,7 @@ router.post('/register', function(req, res) {
         }else{
             response.result = message;
         }
+        res.setHeader('Content-Type', 'text/plain');
         res.write(JSON.stringify(response));
         res.end();
     });
