@@ -8,7 +8,7 @@ var mysql_pool = mysql.createPool({
     database: "gmtool"
 });
 
-mysql_pool.query("create table if not exists account_register (name varchar(30), password varchar(200), group_id int unsigned)", function(err, rows, fields) {
+mysql_pool.query("create table if not exists account_register (name varchar(200), password varchar(200), group_id int unsigned)", function(err, rows, fields) {
     if(err) throw err;
 });
 /*
