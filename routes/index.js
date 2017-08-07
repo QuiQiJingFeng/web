@@ -16,7 +16,7 @@ router.route('/')
     });
 
 router.get('/login', function(req, res){
-    res.render('login.jade', {title:'QueQiJingFeng Console'});
+    res.render('login.jade', {title:'QueQiJingFeng Console',account_text:'账户:',password_text:'密码:',btnLogin:'登录',btnRegister:'注册'});
 });   
 
 /*===================================LOGIC=====================================*/
@@ -47,9 +47,8 @@ router.post('/login', function(req, res) {
         if(check){
             response.result = 'success';
         }
-        res.setHeader('Content-Type', 'text/plain');
-        res.write(JSON.stringify(response));
-        res.end();
+        res.setHeader('Content-Type', 'application/json');
+        res.send(response);
     });
 });
 /* 
@@ -80,6 +79,7 @@ function RegisterAccount(account,password,call_back){
 router.post('/register', function(req, res) {
     let account = req.body.account;
     let password = req.body.password;
+    console.log("body = ",req.body);
     if (!account || !password || !account.trim() || !password.trim()) return;
     let response = {};
     RegisterAccount(account,password,function(check,message) {
@@ -88,9 +88,8 @@ router.post('/register', function(req, res) {
         }else{
             response.result = message;
         }
-        res.setHeader('Content-Type', 'text/plain');
-        res.write(JSON.stringify(response));
-        res.end();
+        res.setHeader('Content-Type', 'application/json');
+        res.send(response);
     });
 });
 

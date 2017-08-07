@@ -2,7 +2,18 @@ body {
   padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
+ 
+.div_title {
+  text-align: center;
+}
 
-a {
-  color: #00B7FF;
+.dev_login {
+  width : 300px;
+  height: 300px;
+  text-align: center;
+  background-color: #999999;
+} 
+
+.with100px {
+  width: 100px;
 }
