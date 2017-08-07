@@ -3,13 +3,18 @@ html(lang="en")
     head
         title #{title}
         link(rel='stylesheet', href='/stylesheets/style.css')
+        script(src="/javascripts/login.js")
     body
-        div.title
-            p HELLO WORLD!!!
-            img(src="http://www.w3school.com.cn/i/eg_tulip.jpg")
-            .main
-                input(type="text",name="account")
-                .main2
-                    input(type="text",name="password")
-
+        div(class="div_title")
+            p #{title}
+        div(class="dev_login")
+            form(id="form1" enctype='application/json' method="post")
+                p #{account_text} 
+                input(type="text" id="input_account" name="account")
+                p #{password_text}
+                input(type="text" id="input_password" name="password")
+                p
+                button(type="button" class="with100px" value='#{btnLogin}' onclick="btnCommitClicked('login');") #{btnLogin}
+                p
+                button(type="button" class="with100px" value='#{btnRegister}' onclick="btnCommitClicked('register');") #{btnRegister}
             
