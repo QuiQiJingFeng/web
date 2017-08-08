@@ -1,14 +1,20 @@
 
 function btnCommitClicked(action){
-    var form1 = document.getElementById("form1")
-    form1.action = action;
-    
-    var account = document.getElementById("input_account").value;
-    var password = document.getElementById("input_password").value;
+    var account = $('#input_account').val();
+    var password = $('#input_password').val();
     if(account ==  null || account == '' || password ==  null || password == ''){
-            alert("account or password must not null");
-            return false;
+        alert("account or password must not null");
+        return;
     }
-    form1.submit();
-    return true;
+    $.ajax({
+        type: 'POST',
+        url: action,
+        data: {
+            account:account,
+            password:password
+        },
+        success: function(result){
+            console.log("FYD+++++++",result);
+        }
+    });
 }

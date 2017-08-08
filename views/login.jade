@@ -3,18 +3,18 @@ html(lang="en")
     head
         title #{title}
         link(rel='stylesheet', href='/stylesheets/style.css')
+        script(src="libs/jquery.js")
         script(src="/javascripts/login.js")
     body
         div(class="div_title")
             p #{title}
         div(class="dev_login")
-            form(id="form1" enctype='application/json' method="post")
-                p #{account_text} 
-                input(type="text" id="input_account" name="account")
-                p #{password_text}
-                input(type="text" id="input_password" name="password")
-                p
-                button(type="button" class="with100px" value='#{btnLogin}' onclick="btnCommitClicked('login');") #{btnLogin}
-                p
-                button(type="button" class="with100px" value='#{btnRegister}' onclick="btnCommitClicked('register');") #{btnRegister}
+            p #{account_text} 
+            input(type="text" id="input_account" name="account")
+            p #{password_text}
+            input(type="text" id="input_password" password="*" name="password")
+            p
+            button(type="button" class="with100px" value='#{btnLogin}' onclick="btnCommitClicked('login');") #{btnLogin}
+            p
+            button(type="button" class="with100px" value='#{btnRegister}' onclick="btnCommitClicked('register');") #{btnRegister}
             

@@ -1,6 +1,6 @@
 body {
   padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  font: 15px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
  
 .div_title {
@@ -12,6 +12,8 @@ body {
   height: 300px;
   text-align: center;
   background-color: #999999;
+  /*让div居中显示*/
+  margin: auto;
 } 
 
 .with100px {
