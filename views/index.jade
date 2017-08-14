@@ -1,5 +1,21 @@
-extends layout
-
-block content
-  h1= title
-  p #{admin} Welcome to #{title}
+doctype html
+html(lang="en")
+    head
+        title #{title}
+        script(src="libs/jquery.js")
+        script(src="libs/react.js")
+        script(src="libs/react-dom.js")
+        script(src="libs/browser.js")
+    body
+        div(class="div_title")
+            p #{title}
+        div(class="dev_login")
+            p #{account_text} 
+            input(type="text" id="input_account" name="account")
+            p #{password_text}
+            input(type="text" id="input_password" password="*" name="password")
+            p
+            button(type="button" class="with100px" value='#{btnLogin}' onclick="btnCommitClicked('login');") #{btnLogin}
+            p
+            button(type="button" class="with100px" value='#{btnRegister}' onclick="btnCommitClicked('register');") #{btnRegister}
+            

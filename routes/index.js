@@ -14,11 +14,18 @@ router.route('/')
             res.redirect('/login');
         }
     });
-
+//登录界面
 router.get('/login', function(req, res){
     res.render('login.jade', {title:'QueQiJingFeng Console',account_text:'账户:',password_text:'密码:',btnLogin:'登录',btnRegister:'注册'});
 });   
-
+//主界面
+router.get('/index', function(req, res){
+    if (!req.cookies.login) {
+        res.redirect('/login');
+    }else{
+        res.render('index.jade', {title:'QueQiJingFeng Console'});
+    }
+});
 /*===================================LOGIC=====================================*/
 /*
     @account  账户
@@ -46,6 +53,7 @@ router.post('/login', function(req, res) {
         let response = {result : 'error'};
         if(check){
             response.result = 'success';
+            res.cookie('login', account, { maxAge: 36000000 });
         }
         res.setHeader('Content-Type', 'application/json');
         res.send(response);
@@ -85,6 +93,7 @@ router.post('/register', function(req, res) {
     RegisterAccount(account,password,function(check,message) {
         if(check){
             response.result = 'success';
+            res.cookie('login', account, { maxAge: 36000000 });
         }else{
             response.result = message;
         }

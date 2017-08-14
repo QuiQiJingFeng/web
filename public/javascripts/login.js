@@ -14,7 +14,8 @@ function btnCommitClicked(action){
             password:password
         },
         success: function(result){
-            console.log("FYD+++++++",result);
+            //只要赋给 location 对象一个新值，文档就会使用新的 URL 加载
+            window.location = "/";
         }
     });
 }
