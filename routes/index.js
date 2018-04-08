@@ -251,23 +251,31 @@ router.post('/register', function(req, res) {
     }); 
 });
 
-//获取用户的信息
-router.post('/:table/:token/:user_id',function(req,res){
-    let table_name = req.params.table;
-    let token = req.params.token;
-    let user_id = req.params.user_id;
-    if(!table_name||!token||!user_id) return;
+// 用户所有的操作请求都要经过这个中间件的验证,否则不予通过
+/*
+    所有用户的操作请求都是post形式
+    参数必须包含user_id,token
+*/
+router.use('/operator/*', function (req, res, next) {
     let body = req.body;
+    let token = body.token;
+    let user_id = body.user_id;
     let response = {result:"success"};
-    res.setHeader('Content-Type', 'application/json');
-
+    if(!token || !user_id){
+      response.result = "error_paramater";
+      res.send(response);
+      res.end();
+      next();
+      return;
+    }
     let filter = util.format("`user_id` = %s order by time desc limit 1",mysql_pool.Escape(user_id));
     mysql_pool.Select("login",filter, function(err,rows){
         if(err){
             console.log(err);
             response.result = "interanl_error";
-            response.error_code = constant.ERROR_CODE["10012"];
+            response.error_code = constant.ERROR_CODE["99999"];
             res.send(response);
+            res.end();
             return;
         }
         let data = rows[0];
@@ -277,36 +285,63 @@ router.post('/:table/:token/:user_id',function(req,res){
             if(token != origin_token){
                 response.result = "error_token";
                 res.send(response);
+                res.end();
                 return;
             }
-            mysql_pool.Select(table_name,false,function(err,rows){
-                if(err){
-                    response.result = "internal_error";
-                    response.error_code = constant.ERROR_CODE["10013"]
-                    res.send(response);
-                    return;
-                }
-                let info = rows[0]
-                console.log(info);
-                if(info){
-                    for(let key in body){
-                        if(info[key] != undefined){
-                            response[key] = info[key];
-                        }
-                    }
-                    res.send(response);
-                }else{
-                    response.result = "not_select_info";
-                    res.send(response);
-                }
-            });
+            next();
         }else{
-            response.result = "not_user_info";
+            response.result = "error_request";
             res.send(response);
+            res.end();
+            return;
         }
     });
-});
+  
+  });
 
 
+router.post('/operator/get_user_info',function(req,res){
+    let user_id = req.body.user_id;
+    let response = {result : "success"};
+    let filter = util.format("`user_id` = %s ",mysql_pool.Escape(user_id));
+    mysql_pool.Select("user_info",filter,function(err,rows,error_code){
+        if(err){
+            response.result = "internal_error";
+            response.error_code = error_code;
+            res.send(response);
+            res.end();
+            return;
+        }
+        let info = rows[0];
+        if(info){
+            for(let key in info){
+                response[key] = info[key];
+            }
+            res.send(response);
+        }else{
+            response.result = "not_select_info";
+            res.send(response);
+        }
+        res.end();
+    });
+})
+
+router.post('/operator/get_server_list',function(req,res){
+    let game_type = req.body.game_type;
+    let response = {result : "success"};
+    let filter = util.format("`game_type` = %s ",mysql_pool.Escape(game_type));
+    mysql_pool.Select("room_servers",filter,function(err,rows,error_code){
+        if(err){
+            response.result = "internal_error";
+            response.error_code = error_code;
+            res.send(response);
+            res.end();
+            return;
+        }
+        response.server_list = rows
+        res.send(response);
+        res.end();
+    });
+})
 
 module.exports = router;

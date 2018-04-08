@@ -49,8 +49,12 @@ exports.Select = function(tbname,filter, call_back) {
     var sql_query = convertSelectSql(tbname,filter);
     mysql_pool.query(sql_query, function(err, rows, fileds) {
         console.log("sql=>",sql_query);
-        if(err) console.log(err);
-        call_back(err, rows, fileds);
+        let error_code
+        if(err) {
+            console.log(err);
+            error_code = constant.ERROR_CODE["90001"];
+        };
+        call_back(err, rows, error_code);
     });
 }
 
@@ -59,7 +63,7 @@ exports.Insert = function (tb_name,data,call_back) {
     mysql_pool.query(sql_query, function(err, rows, fileds) {
         console.log("sql=>",sql_query);
         if(err) console.log(err);
-        call_back(err, rows, fileds);
+        call_back(err, rows);
     });
 }
 
