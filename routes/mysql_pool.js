@@ -3,46 +3,69 @@ var util = require('util');
 var mysql_pool = mysql.createPool({
     host:     '127.0.0.1',
     user:     "root",
-    // password: "",
     port:     3306,
-    database: "gmtool"
+    database: "lsj_game"
 });
 
-mysql_pool.query("create table if not exists account_register (name varchar(200), password varchar(200), group_id int unsigned)", function(err, rows, fields) {
-    if(err) throw err;
-});
-/*
-    检查用户是否存在
-    group_id = 0 表示超级管理员用户
-    group_id = 1 表示管理员用户
-    group_id = 2 表示普通用户
-*/
-exports.GetAccount = function GetAccount(name, func) {
-    var sql_query = 'select * from account_register where name = \'' + name + '\''
-
-    mysql_pool.query(sql_query, function(err, rows, fields) {
-        if(err) console.log(err);
-        func(rows)
-    });
-}
-/*
-    注册用户  group_id = 2
-*/
-exports.RegisterAccount = function RegisterAccount(name, password,group_id,func) {
-    var sql_query = 'insert into account_register (name, password, group_id) value (\'' + name + '\',\'' + password + '\',' + group_id + ')';
-
-    mysql_pool.query(sql_query, function(err, rows, fields) {
-        if(err) {
-            console.log(err);
-            func(false);
-        }else {
-            func(true);
+// 将table转化成插入sql语句
+let convertInsertSql = function(tb_name,data) {
+    let query = util.format("insert into `%s` ",tb_name);
+    let fileds = [];
+    let values = [];
+    let updates = [];
+    for( filed in data){
+        let value = data[filed];
+        fileds.push(filed);
+        let temp_value = value;
+        if (typeof(value) == 'string'){
+            if(value != 'now()' && value != "NOW()"){
+                //对用户数据进行转义 避免数据库注入
+                value = mysql.escape(value);
+                temp_value = util.format("%s",value);
+                updates.push(util.format('`%s`=VALUES(`%s`)',filed,filed));
+            }
         }
+        values.push(temp_value);
+    }
+    console.log("fYD====",updates.join(','));
+    query += "(`" + fileds.join("`,`") + "`)" + " values(" + values.join(",") + ")" + " ON DUPLICATE KEY UPDATE " + updates.join(',');
 
+    return query;
+}
+
+let convertSelectSql = function(tb_name,filter) {
+    let query 
+    if(filter){
+        query = "select * from " + tb_name + ' where ' + filter + ";";
+    }
+    else{
+        query = "select * from " + tb_name + ";";
+    }
+
+    return query;
+}
+
+exports.Select = function(tbname,filter, call_back) {
+    var sql_query = convertSelectSql(tbname,filter);
+    mysql_pool.query(sql_query, function(err, rows, fileds) {
+        console.log("sql=>",sql_query);
+        if(err) console.log(err);
+        call_back(err, rows, fileds);
     });
 }
 
+exports.Insert = function (tb_name,data,call_back) {
+    var sql_query = convertInsertSql(tb_name,data);
+    mysql_pool.query(sql_query, function(err, rows, fileds) {
+        console.log("sql=>",sql_query);
+        if(err) console.log(err);
+        call_back(err, rows, fileds);
+    });
+}
 
+exports.Escape = function(content) {
+    return mysql.escape(content);
+}
 
 
 

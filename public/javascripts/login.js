@@ -11,11 +11,14 @@ function btnCommitClicked(action){
         url: action,
         data: {
             account:account,
-            password:password
+            password:password,
+            login_type:"release",
+            platform:"web"
         },
         success: function(result){
             //只要赋给 location 对象一个新值，文档就会使用新的 URL 加载
-            window.location = "/";
+            // window.location = "/";
+            console.log(result);
         }
     });
 }
