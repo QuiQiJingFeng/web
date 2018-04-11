@@ -265,7 +265,6 @@ router.use('/operator/*', function (req, res, next) {
       response.result = "error_paramater";
       res.send(response);
       res.end();
-      next();
       return;
     }
     let filter = util.format("`user_id` = %s order by time desc limit 1",mysql_pool.Escape(user_id));
@@ -299,6 +298,38 @@ router.use('/operator/*', function (req, res, next) {
   
   });
 
+router.post('/operator/get_room_list',function(req,res){
+    let user_id = req.body.user_id;
+    let response = {result : "success"};
+    mysql_pool.SelectCreateOrJoinRoom(user_id,function(err,rows,error_code){
+        if(err){
+            response.result = "internal_error";
+            response.error_code = error_code;
+            res.send(response);
+            res.end();
+            return;
+        }
+        let in_room_id
+        for(let i = 0;i<rows.length;i++){
+            let data = rows[i];
+            if(data.player_list){
+                let player_list = JSON.parse(data.player_list)
+                for(let j = 0;j<player_list.length;j++) {
+                    let obj = player_list[j];
+                    if(obj.user_id == data.user_id){
+                        in_room_id = data.room_id
+                        break;
+                    }
+                }
+            }
+            delete data.player_list;
+        }
+        response.room_id = in_room_id
+        response.room_list = rows;
+        res.send(response);
+        res.end();
+    })
+})
 
 router.post('/operator/get_user_info',function(req,res){
     let user_id = req.body.user_id;
@@ -326,7 +357,7 @@ router.post('/operator/get_user_info',function(req,res){
     });
 })
 
-router.post('/operator/get_server_list',function(req,res){
+router.post('/operator/get_server_list_by_type',function(req,res){
     let game_type = req.body.game_type;
     let response = {result : "success"};
     let filter = util.format("`game_type` = %s ",mysql_pool.Escape(game_type));
@@ -339,6 +370,31 @@ router.post('/operator/get_server_list',function(req,res){
             return;
         }
         response.server_list = rows
+        res.send(response);
+        res.end();
+    });
+})
+
+router.post('/operator/get_server_by_id',function(req,res){
+    let room_id = req.body.room_id
+    if(!room_id) return;
+    let response = {result : "success"};
+    mysql_pool.SelectServerByRoomId(room_id,function(err,rows){
+        if(err){
+            response.result = "internal_error";
+            response.error_code = error_code;
+            res.send(response);
+            res.end();
+            return;
+        }
+        let data = rows[0];
+        if(data){
+            response.server_port = data.server_port;
+            response.server_host = data.server_host;
+        }else{
+            response.result = "no_server_info"
+        }
+        
         res.send(response);
         res.end();
     });

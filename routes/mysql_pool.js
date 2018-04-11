@@ -1,5 +1,6 @@
 var mysql = require('mysql');
 var util = require('util');
+var common = require("./common.js")
 var mysql_pool = mysql.createPool({
     host:     '127.0.0.1',
     user:     "root",
@@ -27,7 +28,6 @@ let convertInsertSql = function(tb_name,data) {
         }
         values.push(temp_value);
     }
-    console.log("fYD====",updates.join(','));
     query += "(`" + fileds.join("`,`") + "`)" + " values(" + values.join(",") + ")" + " ON DUPLICATE KEY UPDATE " + updates.join(',');
 
     return query;
@@ -48,7 +48,6 @@ let convertSelectSql = function(tb_name,filter) {
 exports.Select = function(tbname,filter, call_back) {
     var sql_query = convertSelectSql(tbname,filter);
     mysql_pool.query(sql_query, function(err, rows, fileds) {
-        console.log("sql=>",sql_query);
         let error_code
         if(err) {
             console.log(err);
@@ -61,7 +60,6 @@ exports.Select = function(tbname,filter, call_back) {
 exports.Insert = function (tb_name,data,call_back) {
     var sql_query = convertInsertSql(tb_name,data);
     mysql_pool.query(sql_query, function(err, rows, fileds) {
-        console.log("sql=>",sql_query);
         if(err) console.log(err);
         call_back(err, rows);
     });
@@ -71,7 +69,35 @@ exports.Escape = function(content) {
     return mysql.escape(content);
 }
 
+exports.SelectCreateOrJoinRoom = function(user_id,call_back) {
+    let str = "select join_room.user_id,room_list.room_id,room_list.state,room_list.player_list,room_list.game_type,room_list.expire_time from join_room inner join room_list on join_room.room_id = room_list.room_id where time > '%s' and user_id = %s UNION select create_room.user_id,room_list.room_id,room_list.state,room_list.player_list,room_list.game_type,room_list.expire_time from create_room inner join room_list on create_room.room_id = room_list.room_id where time > '%s' and user_id = %s"
+    
+    let time = common.getNowDateTime()
+    let query = util.format(str,time,user_id,time,user_id)
+    mysql_pool.query(query,function(err, rows, fileds){
+        let error_code
+        if(err) {
+            console.log(err);
+            error_code = constant.ERROR_CODE["90001"];
+        };
+        call_back(err, rows, error_code);
+    })
+    
+}
 
+// 查找房间号所在的服务器
+exports.SelectServerByRoomId = function(room_id,call_back) {
+    let query = "select server_id,server_host,server_port from room_servers where server_id in (select server_id from room_list where room_id=%d);"
+    query = util.format(query,room_id)
+    mysql_pool.query(query, function(err, rows, fileds) {
+        let error_code
+        if(err) {
+            console.log(err);
+            error_code = constant.ERROR_CODE["90001"];
+        };
+        call_back(err, rows, error_code);
+    });
+}
 
 
 

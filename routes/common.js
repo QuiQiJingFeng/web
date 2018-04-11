@@ -28,6 +28,10 @@ common.getClientIp = function(req) {
 common.getNowFormatTime = function() {
   return moment().format('YYYY-MM-DD HH:mm:ss');
 }
+
+common.getNowDateTime = function() {
+  return moment().format('YYYY-MM-DD');
+}
 common.convertTimeFromMysql = function(str){
   return moment(str, "YYYY-MM-DD HH:mm:ss Z").format("YYYY-MM-DD HH:mm:ss");
 }
