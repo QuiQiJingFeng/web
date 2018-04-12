@@ -72,7 +72,7 @@ exports.Escape = function(content) {
 exports.SelectCreateOrJoinRoom = function(user_id,call_back) {
     let str = "select join_room.user_id,room_list.room_id,room_list.state,room_list.player_list,room_list.game_type,room_list.expire_time from join_room inner join room_list on join_room.room_id = room_list.room_id where time > '%s' and user_id = %s UNION select create_room.user_id,room_list.room_id,room_list.state,room_list.player_list,room_list.game_type,room_list.expire_time from create_room inner join room_list on create_room.room_id = room_list.room_id where time > '%s' and user_id = %s"
     
-    let time = common.getNowDateTime()
+    let time = common.getPreDayDateTime()
     let query = util.format(str,time,user_id,time,user_id)
     mysql_pool.query(query,function(err, rows, fileds){
         let error_code

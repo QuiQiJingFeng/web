@@ -29,9 +29,11 @@ common.getNowFormatTime = function() {
   return moment().format('YYYY-MM-DD HH:mm:ss');
 }
 
-common.getNowDateTime = function() {
-  return moment().format('YYYY-MM-DD');
+// 获取前一天的这个时间
+common.getPreDayDateTime = function() {
+  return moment().add(-24,'hours').format('YYYY-MM-DD HH:mm:ss');
 }
+
 common.convertTimeFromMysql = function(str){
   return moment(str, "YYYY-MM-DD HH:mm:ss Z").format("YYYY-MM-DD HH:mm:ss");
 }
