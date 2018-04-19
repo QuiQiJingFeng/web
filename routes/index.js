@@ -360,7 +360,7 @@ router.post('/operator/get_user_info',function(req,res){
 router.post('/operator/get_server_list_by_type',function(req,res){
     let game_type = req.body.game_type;
     let response = {result : "success"};
-    let filter = util.format("`game_type` = %s ",mysql_pool.Escape(game_type));
+    let filter = util.format("`game_type` = %s ",game_type.toString());
     mysql_pool.Select("room_servers",filter,function(err,rows,error_code){
         if(err){
             response.result = "internal_error";
