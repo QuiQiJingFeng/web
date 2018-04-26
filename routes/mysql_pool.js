@@ -99,7 +99,23 @@ exports.SelectServerByRoomId = function(room_id,call_back) {
     });
 }
 
-
+// 查找玩家所有的对局记录
+exports.SelectReplaysByUserId = function(user_id,call_back) {
+    
+    let query = "select create_room.room_id AS room_id,replay_ids.replay_id AS replay_id,create_room.user_id As user_id from create_room inner join replay_ids on(create_room.room_id = replay_ids.room_id && create_room.user_id = %d)\
+    UNION\
+    select join_room.room_id AS room_id,replay_ids.replay_id AS replay_id,join_room.user_id As user_id from join_room inner join replay_ids on(join_room.room_id = replay_ids.room_id && join_room.user_id = %d)\
+    ";
+    query = util.format(query,room_id)
+    mysql_pool.query(query, function(err, rows, fileds) {
+        let error_code
+        if(err) {
+            console.log(err);
+            error_code = constant.ERROR_CODE["90001"];
+        };
+        call_back(err, rows, error_code);
+    });
+}
 
 
 
