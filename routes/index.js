@@ -418,5 +418,12 @@ router.post('/operator/get_replays',function(req,res){
     });
 })
 
+router.post('/alipay',function() {
+})
+
+router.get('/alipay',function() {
+    
+})
+
 
 module.exports = router;
