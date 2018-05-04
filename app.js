@@ -13,7 +13,7 @@ var app = express();
 
 var options = {
   key: fs.readFileSync('./certify/214659013730241.key'),
-  cert: fs.readFileSync('./certify/214659013730241.pem')
+  cert: fs.readFileSync('./certify/public.pem')
 }
 
 // view engine setup
