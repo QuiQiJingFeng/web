@@ -310,6 +310,7 @@ router.post('/operator/get_room_list',function(req,res){
             return;
         }
         let in_room_id
+        let state 
         for(let i = 0;i<rows.length;i++){
             let data = rows[i];
             if(data.player_list){
@@ -318,13 +319,15 @@ router.post('/operator/get_room_list',function(req,res){
                     let obj = player_list[j];
                     if(obj.user_id == data.user_id){
                         in_room_id = data.room_id
+                        state = data.state
                         break;
                     }
                 }
             }
             delete data.player_list;
         }
-        response.room_id = in_room_id
+        response.room_id = in_room_id;
+        response.state = state
         response.room_list = rows;
         res.send(response);
         res.end();
