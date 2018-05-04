@@ -1,13 +1,26 @@
 var express = require('express');
+var https = require('https');
+var http = require('http');
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
+var fs = require('fs');
 var routes = require('./routes/index');
 
 var app = express();
+
+var options = {
+  key: fs.readFileSync('./certify/214659013730241.key'),
+  cert: fs.readFileSync('./certify/214659013730241.pem')
+}
+
+http.createServer(app).listen(80);
+https.createServer(options, app).listen(443);
+
+
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
