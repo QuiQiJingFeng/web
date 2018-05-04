@@ -1,4 +1,3 @@
-var express = require('express');
 var https = require('https');
 var http = require('http');
 var path = require('path');
@@ -9,6 +8,7 @@ var bodyParser = require('body-parser');
 var fs = require('fs');
 var routes = require('./routes/index');
 
+var express = require('express');
 var app = express();
 
 var options = {
@@ -16,15 +16,9 @@ var options = {
   cert: fs.readFileSync('./certify/214659013730241.pem')
 }
 
-http.createServer(app).listen(80);
-https.createServer(options, app).listen(443);
-
-
-
-
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.set('view engine', 'html');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -73,5 +67,8 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+http.createServer(app).listen(80);
+https.createServer(options, app).listen(443);
 
 module.exports = app;

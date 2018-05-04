@@ -17,7 +17,7 @@ router.route('/')
     });
 //登录界面
 router.get('/login', function(req, res){
-    res.render('login.jade', {title:'QueQiJingFeng Console',account_text:'账户:',password_text:'密码:',btnLogin:'登录',btnRegister:'注册'});
+    res.sendfile("./views/index.html");
 });
 
 //主界面
@@ -25,7 +25,7 @@ router.get('/index', function(req, res){
     if (!req.cookies.login) {
         res.redirect('/login');
     }else{
-        res.render('index.jade', {title:'QueQiJingFeng Console'});
+        res.sendfile("./views/index.html");
     }
 });
 
