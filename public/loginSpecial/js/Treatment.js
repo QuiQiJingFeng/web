@@ -31,17 +31,15 @@ function ErroAlert(e) {
 }
 
 //Ajax 错误返回处理
-function AjaxErro(e) {
-    if (e.Status == "Erro") {
-        switch (e.Erro) {
-            case "500":
-                top.location.href = '/Erro/Erro500';
-                break;
-            case "100001":
-                ErroAlert("错误 : 错误代码 '10001'");
+function AjaxErro(result) {
+    console.log("FYD====RESULT = ",result);
+    if (result) {
+        switch (result) {
+            case "success":
+                ErroAlert("登陆成功");
                 break;
             default:
-                ErroAlert(e.Erro);
+                ErroAlert(result);
         }
     } else {
         layer.msg("未知错误！");

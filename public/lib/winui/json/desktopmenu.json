@@ -1,0 +1,17 @@
+﻿{
+  "code": 1,
+  "message": "成功",
+  "data": [
+    {
+      "title": "基本说明",
+      "pageURL": "views/demo/introduce.html",
+      "name": "基本说明",
+      "icon": "fa-info-circle",
+      "openType": 2,
+      "maxOpen": -1,
+      "extend": false,
+      "childs": null,
+      "id": 1
+    }
+  ]
+}

@@ -23,9 +23,9 @@ let convertInsertSql = function(tb_name,data) {
                 //对用户数据进行转义 避免数据库注入
                 value = mysql.escape(value);
                 temp_value = util.format("%s",value);
-                updates.push(util.format('`%s`=VALUES(`%s`)',filed,filed));
             }
         }
+        updates.push(util.format('`%s`=VALUES(`%s`)',filed,filed));
         values.push(temp_value);
     }
     query += "(`" + fileds.join("`,`") + "`)" + " values(" + values.join(",") + ")" + " ON DUPLICATE KEY UPDATE " + updates.join(',');
@@ -118,7 +118,44 @@ exports.SelectReplaysByUserId = function(user_id,call_back) {
 }
 
 
+// 查询当前没有使用的激活码的数量
+exports.SelectCountReduceActiveCode = function(user_id,call_back){
+    let query = "select count(*) AS count from active_code_list where user_id = %d and active_id is null"
+    query = util.format(query,user_id)
+    mysql_pool.query(query, function(err, rows, fileds) {
+        let error_code
+        if(err) {
+            console.log(err);
+            error_code = constant.ERROR_CODE["90001"];
+        };
+        call_back(err, rows, error_code);
+    });
+}
 
+// 查询当前所有没有使用的激活码
+exports.SelectAllReduceActiveCode = function(user_id,call_back){
+    let query = "select * from active_code_list where user_id = %d and active_id is null"
+    query = util.format(query,user_id)
+    mysql_pool.query(query, function(err, rows, fileds) {
+        let error_code
+        if(err) {
+            console.log(err);
+            error_code = constant.ERROR_CODE["90001"];
+        };
+        call_back(err, rows, error_code);
+    });
+}
 
-
-
+// 玩家游戏中 激活 序列码
+exports.ActiveActiveCode = function(active_id,active_code,call_back){
+    let query = "update active_code_list set active_id = %d,active_time=NOW() where active_code = '%s' and active_id is null";
+    query = util.format(query,active_id,active_code);
+    mysql_pool.query(query, function(err, rows, fileds) {
+            let error_code
+            if(err) {
+                console.log(err);
+                error_code = 11
+            };
+            call_back(rows.affectedRows == 1)
+        });
+}

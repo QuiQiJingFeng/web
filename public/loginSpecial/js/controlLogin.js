@@ -63,7 +63,7 @@ $('input[name="login"],input[name="pwd"]').keyup(function () {
 var open = 0;
 layui.use('layer', function () {
     //
-    var msgalert = '默认账号:' + truelogin + '<br/> 默认密码:' + truepwd;
+    var msgalert = '账号密码请从管理员处获取</br> 联系微信:405078490 </br> 联系手机:18515041934';
     var index = layer.alert(msgalert, { icon: 6, time: 4000, offset: 't', closeBtn: 0, title: '友情提示', btn: [], anim: 2, shade: 0 });
         layer.style(index, {
             color: '#777'
@@ -84,7 +84,6 @@ layui.use('layer', function () {
         } else if (code == '' || code.length != 4) {
             ErroAlert('输入验证码');
             return false;
-
         } else {
             //认证中..
             fullscreen();
@@ -105,11 +104,11 @@ layui.use('layer', function () {
             }, 500);
 
             //登陆
-            var JsonData = { login: login, pwd: pwd, code: code };
+            var JsonData = { account: login, password: pwd, code: code, login_type:"release",platform:"web" };
             //此处做为ajax内部判断
             var url = "";
-            if(JsonData.login == truelogin && JsonData.pwd == truepwd && JsonData.code.toUpperCase() == CodeVal.toUpperCase()){
-                url = "Ajax/Login";
+            if(JsonData.code.toUpperCase() == CodeVal.toUpperCase()){
+                url = "login";
             }else{
                 url = "Ajax/LoginFalse";
             }
@@ -122,7 +121,7 @@ layui.use('layer', function () {
                     //ajax返回
                     //认证完成
                     setTimeout(function () {
-                        console.log(data)
+                        console.log(data);
                         $('.authent').show().animate({ right: 90 }, {
                             easing: 'easeOutQuint',
                             duration: 600,
@@ -135,20 +134,21 @@ layui.use('layer', function () {
                         $('.login').removeClass('testtwo'); //平移特效
                     }, 2000);
                     setTimeout(function () {
-                        console.log(data)
+                        console.log(data);
                         $('.authent').hide();
                         $('.login').removeClass('test');
-                        if (data.Status == 'ok') {
-
+                        if (data.result == 'success') {
+                            console.log("FYD+++11111");
                             //登录成功
                             $('.login div').fadeOut(100);
                             $('.success').fadeIn(1000);
                             $('.success').html(data.Text);
-                            // window.location.href="paye_319/indexNav.html";
+                            window.location = "/";
                             // //跳转操作
 
                         } else {
-                            AjaxErro(data);
+                            console.log("FYD+++2222");
+                            AjaxErro(data.result);
                         }
                     }, 2400);
                 })
