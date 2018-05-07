@@ -17,7 +17,7 @@ router.route('/')
     });
 //登录界面
 router.get('/login', function(req, res){
-    res.sendfile("./views/index.html");
+    res.sendfile("./views/login.html");
 });
 
 //主界面
@@ -27,6 +27,10 @@ router.get('/index', function(req, res){
     }else{
         res.sendfile("./views/index.html");
     }
+});
+
+router.get('/test',function(req,res){
+    res.sendfile("./views/test.html");
 });
 
 /*
@@ -52,7 +56,7 @@ router.post('/login', function(req, res) {
     res.setHeader('Content-Type', 'application/json');
     console.log("|fyd  platform == >",platform);
     password = common.hmacSH1(password);
-    
+    console.log("pwd = ",password);
     if(platform == "web"){
         //如果是web登录  不需要初始化用户的信息,因为只用作后台操作
         let filter = util.format("`account` = %s and `password` = %s ",mysql_pool.Escape(account),mysql_pool.Escape(password));
@@ -81,7 +85,7 @@ router.post('/login', function(req, res) {
                         res.send(response);
                         return;
                     }
-                    res.cookie('login', account, { maxAge: 36000000 });
+                    res.cookie('login', account, { maxAge: 36000 });
                     response.user_id = data.user_id;
                     response.token = common.hmacSH1(data.user_id.toString() + now.toString());
                     res.send(response);
@@ -211,8 +215,8 @@ router.post('/register', function(req, res) {
     let password = req.body.password;
     let login_type = req.body.login_type;
     let platform = req.body.platform;
-
-    if (!account || !password || !login_type || !platform) return;
+    let bind_id = req.body.bind_id
+    if (!account || !password || !login_type || !platform || !bind_id) return;
     password = common.hmacSH1(password);
     let response = {result:"success"};
     res.setHeader('Content-Type', 'application/json');
@@ -236,6 +240,7 @@ router.post('/register', function(req, res) {
             user_ip:user_ip,
             group_id:constant["GROUP_TYPE"]["COMMAN_USER"],
             account:account,password:password,login_type:login_type,platform:platform,time:"NOW()",
+            bind_id:bind_id
         };
 
         mysql_pool.Insert("register",content,function(err, info) {
@@ -428,5 +433,87 @@ router.get('/alipay',function() {
     
 })
 
+// 点击按钮生成激活码
+// user_id jihuoma active_time activeid
+router.post('/operator/generate_active_codes',function(req,res){
+    let user_id = req.body.user_id
+    if(!user_id) return;
 
+    let response = {result : "success"};
+    mysql_pool.SelectCountReduceActiveCode(user_id,function(err,rows){
+        if(err){
+            response.result = "internal_error";
+            response.error_code = error_code;
+            res.send(response);
+            res.end();
+            return;
+        }
+        let count = rows[0].count;
+        console.log("COUNT -0-00->>",count)
+        let num = 100 - count;  // 空闲激活码的数量最多为100个
+        for (var idx = 1; idx <= num; idx++) {
+            let active_code = util.format("%d%d%d",user_id,idx,Date.now()).toString(32);
+            let data = {user_id : user_id,active_code : active_code}
+            mysql_pool.Insert("active_code_list",data,function(err, rows){
+                if(err){
+                    response.result = "internal_error";
+                    response.error_code = error_code;
+                    res.send(response);
+                    res.end();
+                    return;
+                }
+            })
+        }
+        res.send(response);
+        res.end(); 
+    });
+})
+
+// 查询所有可用的激活码列表
+router.post('/operator/get_active_codes',function(req,res){
+    let user_id = req.body.user_id
+    if(!user_id) return;
+    
+    let response = {result : "success"};
+    mysql_pool.SelectAllReduceActiveCode(user_id,function(err,rows){
+            if(err){
+                response.result = "internal_error";
+                response.error_code = error_code;
+                res.send(response);
+                res.end();
+                return;
+            }
+            response.data = rows
+            res.send(response);
+            res.end();
+        })
+})
+
+// 玩家游戏中 激活 序列码
+router.post('/operator/active_active_code',function(req,res){
+    let user_id = req.body.user_id
+    if(!user_id) return;
+    let active_code = req.body.active_code
+    if(!active_code) return;
+
+    let response = {result:"success"}
+    exports.ActiveActiveCode(user_id,active_code,function(success){
+        if(err){
+            response.result = "internal_error";
+            response.error_code = error_code;
+            res.send(response);
+            res.end();
+            return;
+        }
+        if(success){
+            res.send(response);
+        }else{
+            response.result = "faild";
+            res.send(response);
+        }
+        res.end();
+    })
+})
+
+ 
 module.exports = router;
