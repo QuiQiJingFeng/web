@@ -1,7 +1,6 @@
 var crypto = require('crypto');
 let moment = require('moment');
 var https = require("https");
-var iconv = require("iconv-lite");
 moment().utcOffset(8);
 let common = {};
 
@@ -74,16 +73,17 @@ common.PlatformCheck = function(platform,uid,token,call_back) {
   console.log(finalUrl);
   
   https.get(url, function (res) {  
-        var datas = [];  
-        var size = 0;  
-        res.on('data', function (data) {  
-            datas.push(data);  
-            size += data.length;  
-        //process.stdout.write(data);  
+        if(res.statusCode != 200) {
+          console.log("statusCode:", res.statusCode);
+          return;
+        }
+        res.setEncoding('utf-8');
+        var responseString = [];
+        res.on('data', function(data) {
+          responseString.push(decodeURIComponent(data));
         });  
         res.on("end", function () {
-            var buff = Buffer.concat(datas, size);  
-            var result = iconv.decode(buff, "utf8");//转码//var result = buff.toString();//不需要转编码,直接tostring  
+            var result = JSON.parse(responseString);  
             console.log(result);
             if (result[options[checkArg]] == options[checkValue]){
                call_back();
