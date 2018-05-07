@@ -55,7 +55,10 @@ router.post('/login', function(req, res) {
     let response = {result:"success"};
     res.setHeader('Content-Type', 'application/json');
     console.log("|fyd  platform == >",platform);
-    password = common.hmacSH1(password);
+    if(platform == "web"){
+        password = common.hmacSH1(password);
+    }
+    
     console.log("pwd = ",password);
     if(platform == "web"){
         //如果是web登录  不需要初始化用户的信息,因为只用作后台操作

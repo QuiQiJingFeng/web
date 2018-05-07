@@ -43,7 +43,7 @@ common.convertTimeFromMysql = function(str){
 
 let platform_optioins = {
   ["weixin"] : {
-      ["baseUrl"] : "https://api.weixin.qq.com/sns/auth?",
+      ["baseUrl"] : "https://api.weixin.qq.com/sns/auth",
       ["link"] : { access_token : "token",openid : "uid"},
       ["method"] : "GET",
       ["checkArg"] : "errcode",
