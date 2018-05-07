@@ -85,7 +85,7 @@ common.PlatformCheck = function(platform,uid,token,call_back) {
             var buff = Buffer.concat(datas, size);  
             var result = iconv.decode(buff, "utf8");//转码//var result = buff.toString();//不需要转编码,直接tostring  
             console.log(result);
-            if (result[options[checkArg]] == options[checkValue]] ){
+            if (result[options[checkArg]] == options[checkValue]){
                call_back();
             }else{
               call_back("auth faild")
