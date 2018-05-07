@@ -1,5 +1,7 @@
 var crypto = require('crypto');
 let moment = require('moment');
+var https = require("https");
+var iconv = require("iconv-lite");
 moment().utcOffset(8);
 let common = {};
 
@@ -44,10 +46,16 @@ let platform_optioins = {
       ["baseUrl"] : "https://api.weixin.qq.com/sns/auth?",
       ["link"] : { access_token : "token",openid : "uid"},
       ["method"] : "GET",
+      ["checkArg"] : "errcode",
+      ["checkValue"] : 0
   }
 }
 //TODO 
 common.PlatformCheck = function(platform,uid,token,call_back) {
+  if(platform == "mengya"){
+    call_back();
+    return;
+  }
   let options = platform_optioins[platform];
   if (!options){
       call_back("unknown_platform");
@@ -64,10 +72,30 @@ common.PlatformCheck = function(platform,uid,token,call_back) {
   let baseUrl = options.baseUrl;
   const finalUrl = `${baseUrl}?${common.encodeSearchParams(obj)}`;
   console.log(finalUrl);
-  //TODO
-  call_back();
+  
+  https.get(url, function (res) {  
+        var datas = [];  
+        var size = 0;  
+        res.on('data', function (data) {  
+            datas.push(data);  
+            size += data.length;  
+        //process.stdout.write(data);  
+        });  
+        res.on("end", function () {
+            var buff = Buffer.concat(datas, size);  
+            var result = iconv.decode(buff, "utf8");//转码//var result = buff.toString();//不需要转编码,直接tostring  
+            console.log(result);
+            if (result[options[checkArg]] == options[checkValue]] ){
+               call_back();
+            }else{
+              call_back("auth faild")
+            }
+        });  
+    }).on("error", function (err) {
+        console.log("FYD---->>>>>",err); 
+    });  
 }
-
+ 
 common.hmacSH1 = function(content){
   var hmac = crypto.createHmac('sha1', 'FHQYDIDXIL1ZQL');
   hmac.update(content);
