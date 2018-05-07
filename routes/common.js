@@ -12,7 +12,6 @@ common.encodeSearchParams = function(obj) {
       if (typeof value === 'undefined') {
         value = ''
       }
-      // 对于需要编码的文本（比如说中文）我们要进行编码
       params.push([key, encodeURIComponent(value)].join('='))
     })
   
@@ -30,7 +29,6 @@ common.getNowFormatTime = function() {
   return moment().format('YYYY-MM-DD HH:mm:ss');
 }
 
-// 获取前一天的这个时间
 common.getPreDayDateTime = function() {
   return moment().add(-24,'hours').format('YYYY-MM-DD HH:mm:ss');
 }
@@ -49,7 +47,7 @@ let platform_optioins = {
       ["checkValue"] : 0
   }
 }
-//TODO 
+
 common.PlatformCheck = function(platform,uid,token,call_back) {
   if(platform == "mengya"){
     call_back();
@@ -71,8 +69,7 @@ common.PlatformCheck = function(platform,uid,token,call_back) {
   let baseUrl = options.baseUrl;
   const finalUrl = `${baseUrl}?${common.encodeSearchParams(obj)}`;
   console.log(finalUrl);
-  
-  https.get(url, function (res) {  
+  https.get(finalUrl, function (res) {  
         if(res.statusCode != 200) {
           console.log("statusCode:", res.statusCode);
           return;
@@ -86,9 +83,9 @@ common.PlatformCheck = function(platform,uid,token,call_back) {
             var result = JSON.parse(responseString);  
             console.log(result);
             if (result[options["checkArg"]] == options["checkValue"]){
-               call_back();
+                call_back()
             }else{
-              call_back("auth faild")
+                call_back("auth_faild")
             }
         }); 
         res.on('error', function(err) {
@@ -100,6 +97,7 @@ common.PlatformCheck = function(platform,uid,token,call_back) {
           console.log("close: ");
         }); 
     }) 
+   
 }
  
 common.hmacSH1 = function(content){
@@ -116,4 +114,5 @@ common.hmacSH1 = function(content){
 
 
 module.exports = common;
+
 
