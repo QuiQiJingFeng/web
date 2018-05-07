@@ -85,15 +85,21 @@ common.PlatformCheck = function(platform,uid,token,call_back) {
         res.on("end", function () {
             var result = JSON.parse(responseString);  
             console.log(result);
-            if (result[options[checkArg]] == options[checkValue]){
+            if (result[options["checkArg"]] == options["checkValue"]){
                call_back();
             }else{
               call_back("auth faild")
             }
-        });  
-    }).on("error", function (err) {
-        console.log("FYD---->>>>>",err); 
-    });  
+        }); 
+        res.on('error', function(err) {
+          console.log("res error:");
+          console.error(err);
+        });
+
+        res.on('close',function(){
+          console.log("close: ");
+        }); 
+    }) 
 }
  
 common.hmacSH1 = function(content){
