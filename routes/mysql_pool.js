@@ -104,10 +104,10 @@ exports.SelectReplaysByUserIdAndTime = function(user_id,pre_date,last_date,limit
     let sql = ""
     let query = ""
     if(game_type){
-        sql = "select max(replay_id) as replay_id,max(room_id) as room_id,max(players) as players,max(game_type) as game_type,max(time) as time from replay_ids where players like \"%user_id\\\":%d%\" and time >= \"%s\" and time <= \"%s\" and game_type = %d group by room_id order by time desc limit %d;";
+        sql = "select max(replay_id) as replay_id,max(room_id) as room_id,max(players) as players,max(game_type) as game_type,max(time) as time from replay_ids where players like \"%user_id\\\":%d%\" and time >= \"%s\" and time < \"%s\" and game_type = %d group by room_id order by time desc limit %d;";
         query = util.format(sql,user_id,pre_date,last_date,game_type,limit);
     }else{
-       sql = "select max(replay_id) as replay_id,max(room_id) as room_id,max(players) as players,max(game_type) as game_type,max(time) as time from replay_ids where players like \"%user_id\\\":%d%\" and time >= \"%s\" and time <= \"%s\" group by room_id order by time desc limit %d;"; 
+       sql = "select max(replay_id) as replay_id,max(room_id) as room_id,max(players) as players,max(game_type) as game_type,max(time) as time from replay_ids where players like \"%user_id\\\":%d%\" and time >= \"%s\" and time < \"%s\" group by room_id order by time desc limit %d;"; 
        query = util.format(sql,user_id,pre_date,last_date,limit);
     }
     mysql_pool.query(query, function(err, rows, fileds) {
