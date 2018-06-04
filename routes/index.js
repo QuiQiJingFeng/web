@@ -434,6 +434,24 @@ router.post('/operator/get_replays',function(req,res){
     });
 })
 
+router.post('/operator/get_replays_by_room_id',function(req,res){
+    let room_id = req.body.room_id
+    if(!room_id) return;
+    let response = {result : "success"};
+    mysql_pool.SelectReplaysByRoomId(room_id,function(err,rows){
+        if(err){
+            response.result = "internal_error";
+            response.error_code = error_code;
+            res.send(response);
+            res.end();
+            return;
+        }
+        response.replays = rows;
+        res.send(response);
+        res.end();
+    });
+})
+
 router.post('/alipay',function() {
 })
 

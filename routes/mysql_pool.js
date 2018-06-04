@@ -121,9 +121,17 @@ exports.SelectReplaysByUserIdAndTime = function(user_id,pre_date,last_date,limit
 }
 
 //根据房间号查询战局记录
-exports.SelectReplaysByRoomId = function(user_id,call_back) {
-    
-
+exports.SelectReplaysByRoomId = function(room_id,call_back) {
+    let sql = "select * from replay_ids where room_id = %d"
+    let query = util.format(sql,room_id)
+    mysql_pool.query(query, function(err, rows, fileds) {
+        let error_code
+        if(err) {
+            console.log(err);
+            error_code = constant.ERROR_CODE["90001"];
+        };
+        call_back(err, rows, error_code);
+    });
 }
 
 
