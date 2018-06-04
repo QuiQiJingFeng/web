@@ -100,10 +100,16 @@ exports.SelectServerByRoomId = function(room_id,call_back) {
 }
 
 //查询某个玩家 在某个时间点之后的所有房间信息记录
-
-exports.SelectReplaysByUserIdAndTime = function(user_id,pre_date,last_date,limit,call_back){
-    let sql = "select max(replay_id) as replay_id,max(room_id) as room_id,max(players) as players,max(game_type) as game_type,max(time) as time from replay_ids where players like \"%user_id\\\":%d%\" and time >= \"%s\" and time <= \"%s\" group by room_id order by time desc limit %d;";
-    let query = util.format(sql,user_id,pre_date,last_date,limit);
+exports.SelectReplaysByUserIdAndTime = function(user_id,pre_date,last_date,limit,game_type,call_back){
+    let sql = ""
+    let query = ""
+    if(game_type){
+        sql = "select max(replay_id) as replay_id,max(room_id) as room_id,max(players) as players,max(game_type) as game_type,max(time) as time from replay_ids where players like \"%user_id\\\":%d%\" and time >= \"%s\" and time <= \"%s\" and game_type = %d group by room_id order by time desc limit %d;";
+        query = util.format(sql,user_id,pre_date,last_date,game_type,limit);
+    }else{
+       sql = "select max(replay_id) as replay_id,max(room_id) as room_id,max(players) as players,max(game_type) as game_type,max(time) as time from replay_ids where players like \"%user_id\\\":%d%\" and time >= \"%s\" and time <= \"%s\" group by room_id order by time desc limit %d;"; 
+       query = util.format(sql,user_id,pre_date,last_date,limit);
+    }
     mysql_pool.query(query, function(err, rows, fileds) {
         let error_code
         if(err) {
@@ -114,22 +120,10 @@ exports.SelectReplaysByUserIdAndTime = function(user_id,pre_date,last_date,limit
     });
 }
 
-// 查找玩家所有的对局记录
-exports.SelectReplaysByUserId = function(user_id,call_back) {
+//根据房间号查询战局记录
+exports.SelectReplaysByRoomId = function(user_id,call_back) {
     
-    let query = "select create_room.room_id AS room_id,replay_ids.replay_id AS replay_id,create_room.user_id As user_id from create_room inner join replay_ids on(create_room.room_id = replay_ids.room_id && create_room.user_id = %d)\
-    UNION\
-    select join_room.room_id AS room_id,replay_ids.replay_id AS replay_id,join_room.user_id As user_id from join_room inner join replay_ids on(join_room.room_id = replay_ids.room_id && join_room.user_id = %d)\
-    ";
-    query = util.format(query,user_id,user_id)
-    mysql_pool.query(query, function(err, rows, fileds) {
-        let error_code
-        if(err) {
-            console.log(err);
-            error_code = constant.ERROR_CODE["90001"];
-        };
-        call_back(err, rows, error_code);
-    });
+
 }
 
 
