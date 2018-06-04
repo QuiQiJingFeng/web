@@ -99,6 +99,20 @@ exports.SelectServerByRoomId = function(room_id,call_back) {
     });
 }
 
+//查询某个玩家 在某个时间点之后的所有房间信息记录
+exports.SelectReplaysByUserIdAndTime(user_id,pre_date,last_date,call_back){
+    let sql = "select max(replay_id) as replay_id,max(room_id) as room_id,max(players) as players,max(game_type) as game_type,max(time) as time from replay_ids where players like \"%user_id\\\":%d%\" and time >= \"%s\" and time <= \"%s\" group by room_id order by time desc limit 1;";
+    let query = util.format(sql,user_id,pre_date,last_date);
+    mysql_pool.query(query, function(err, rows, fileds) {
+        let error_code
+        if(err) {
+            console.log(err);
+            error_code = constant.ERROR_CODE["90001"];
+        };
+        call_back(err, rows, error_code);
+    });
+}
+
 // 查找玩家所有的对局记录
 exports.SelectReplaysByUserId = function(user_id,call_back) {
     
@@ -158,4 +172,44 @@ exports.ActiveActiveCode = function(active_id,active_code,call_back){
             };
             call_back(rows.affectedRows == 1)
         });
+}
+
+
+// 查找玩家(user_id)的 level 级代理的数量
+exports.SearchProxyByLevel = function(user_id,level){
+    var util = require('util');
+    let prefix = "SELECT count(*) as count FROM user_info where invite_code REGEXP \"%d%s\"";
+    let levelStr = "";
+    for (let i = 1; i<=level; i++){
+        levelStr += "-[0-9]*";
+    }
+    levelStr += "$";
+    let query = util.format(prefix,user_id,levelStr);
+    mysql_pool.query(query, function(err, rows, fileds) {
+        let error_code
+        if(err) {
+            console.log(err);
+            error_code = 11
+        };
+        call_back(rows)
+    });
+}
+// 查询玩家(user_id) 的某级的全部代理
+exports.SearchProxyByLevel = function(user_id,level){
+    var util = require('util');
+    let prefix = "SELECT count(*) as count FROM user_info where invite_code REGEXP \"%d%s\"";
+    let levelStr = "";
+    for (let i = 1; i<=level; i++){
+        levelStr += "-[0-9]*";
+    }
+    levelStr += "$";
+    let query = util.format(prefix,user_id,levelStr);
+    mysql_pool.query(query, function(err, rows, fileds) {
+        let error_code
+        if(err) {
+            console.log(err);
+            error_code = 11
+        };
+        call_back(rows.affectedRows == 1)
+    });
 }
