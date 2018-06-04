@@ -415,9 +415,9 @@ router.post('/operator/get_replays',function(req,res){
     let user_id = req.body.user_id
     let pre_date = req.body.pre_date
     let last_date = req.body.last_date  
-    let limit = req.body.limit || 10
+    let limit = req.body.limit
 
-    if(!user_id || !pre_date || !last_date) return;
+    if(!user_id || !pre_date || !last_date || !limit) return;
     let response = {result : "success"};
     mysql_pool.SelectReplaysByUserIdAndTime(user_id,pre_date,last_date,limit,function(err,rows){
         if(err){
