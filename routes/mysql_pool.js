@@ -100,9 +100,9 @@ exports.SelectServerByRoomId = function(room_id,call_back) {
 }
 
 //查询某个玩家 在某个时间点之后的所有房间信息记录
-exports.SelectReplaysByUserIdAndTime(user_id,pre_date,last_date,call_back){
-    let sql = "select max(replay_id) as replay_id,max(room_id) as room_id,max(players) as players,max(game_type) as game_type,max(time) as time from replay_ids where players like \"%user_id\\\":%d%\" and time >= \"%s\" and time <= \"%s\" group by room_id order by time desc limit 1;";
-    let query = util.format(sql,user_id,pre_date,last_date);
+exports.SelectReplaysByUserIdAndTime(user_id,pre_date,last_date,limit,call_back){
+    let sql = "select max(replay_id) as replay_id,max(room_id) as room_id,max(players) as players,max(game_type) as game_type,max(time) as time from replay_ids where players like \"%user_id\\\":%d%\" and time >= \"%s\" and time <= \"%s\" group by room_id order by time desc limit %d;";
+    let query = util.format(sql,user_id,pre_date,last_date,limit);
     mysql_pool.query(query, function(err, rows, fileds) {
         let error_code
         if(err) {

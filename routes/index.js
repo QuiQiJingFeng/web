@@ -414,11 +414,12 @@ router.post('/operator/get_server_by_id',function(req,res){
 router.post('/operator/get_replays',function(req,res){
     let user_id = req.body.user_id
     let pre_date = req.body.pre_date
-    let last_date = req.body.last_date
+    let last_date = req.body.last_date  
+    let limit = req.body.limit || 10
 
     if(!user_id || !pre_date || !last_date) return;
     let response = {result : "success"};
-    mysql_pool.SelectReplaysByUserIdAndTime(user_id,pre_date,last_date,function(err,rows){
+    mysql_pool.SelectReplaysByUserIdAndTime(user_id,pre_date,last_date,limit,function(err,rows){
         if(err){
             response.result = "internal_error";
             response.error_code = error_code;
