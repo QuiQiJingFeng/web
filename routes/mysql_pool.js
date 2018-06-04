@@ -100,7 +100,7 @@ exports.SelectServerByRoomId = function(room_id,call_back) {
 }
 
 //查询某个玩家 在某个时间点之后的所有房间信息记录
-exports.SelectReplaysByUserIdAndTime = function(user_id,pre_date,last_date,limit,game_type,call_back){
+exports.SelectReplaysByUserIdAndTime = function(user_id,pre_date,last_date,game_type,limit,call_back){
     let sql = ""
     let query = ""
     if(game_type){
