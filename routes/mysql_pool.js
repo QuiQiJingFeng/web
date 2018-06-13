@@ -122,7 +122,7 @@ exports.SelectReplaysByUserIdAndTime = function(user_id,pre_date,last_date,game_
 
 //根据房间号查询战局记录
 exports.SelectReplaysByRoomId = function(room_id,call_back) {
-    let sql = "select * from replay_ids where room_id = %d"
+    let sql = "select * from replay_ids where room_id = %d and players IS NOT NULL"
     let query = util.format(sql,room_id)
     mysql_pool.query(query, function(err, rows, fileds) {
         let error_code
