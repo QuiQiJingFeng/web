@@ -1,0 +1,318 @@
+/*新m站*/
+.mj_wrap{
+	height: 100%;
+	/*background: url(../res/wrap1.png) no-repeat;*/
+	background-size: 100% 30%;
+}
+.down_wrap{
+	display: inline-block;
+	width: 100%;
+	height: 100%;
+	background: url(../res/wrap2.png) no-repeat 0 1.5rem ;
+	background-size: 100% 108%;
+}
+.logo{
+	margin-top:0.5rem;
+	
+}
+#downloadBtn{
+	display:inline-block;
+	padding:0.2rem 2rem;
+	color: #fff;
+	background: #00a2ef;
+	font-size: 0.4rem;
+	word-spacing:8px;
+	letter-spacing: 2px;
+}
+.logo_txt{
+	margin-top: 10px;
+	margin-bottom: 0px;
+}
+.logo_xc{
+	background: #fdded8;
+	color:#e27777;
+	border: 1px solid #e2acae;
+	padding: 0 0.1rem;
+	position: absolute;
+	top: 0.05rem;
+	right: 3.1rem;
+	font-size: 0.2rem;
+}
+
+.briefMsg{
+	padding:0.2rem 0.5rem;
+	font-size: 0.36rem;
+	margin-bottom: 0;
+}
+.safeTip{
+	position:absolute;
+	bottom:0rem;
+	font-size: 0.3rem;
+	list-style: none;
+	padding-left: 0.5rem;
+	margin-bottom:5px;
+	color: #999;
+}
+.beian{
+	position:absolute;
+	bottom:0.12rem;
+	right: 0.5rem;
+	color:#999;
+	font-size: 0.3rem;
+}
+.lunbo{
+	height: 7.2rem;		
+	padding-top: 2.5rem;
+}
+/*微信场景*/
+.top-download {
+		width: 100%;
+		height: 100%;
+		position: fixed;
+		top: 0rem;
+		left: 0;
+		background-color: transparent;
+		color: #fff;
+		display: none;
+}
+.top-download span {
+		position: absolute;
+		left: -1rem;
+		right: 0;
+		top: -0.6rem;
+		bottom: 0;
+		margin: 0 auto;
+		width: 100%;
+		height: 9rem;
+		line-height: 10rem;
+		font-size: 1.4rem;
+		padding-left: 1.5rem;
+		background: url(../res/arrows.png) 100% 10% no-repeat;
+		background-size: 20% 20%;
+		z-index: 9999;
+}
+.shareClass{
+	max-width:90%;
+	z-index:999999;	
+}
+.andshareClass{
+	max-width:95%;
+	z-index:999999;
+}
+.iospic{	
+	top: 52%;
+		left: 50%;
+		position: absolute;
+		z-index: 20; 
+		transform: translate(-50%,-50%);
+		width:80%;
+		text-align:center;
+}
+.androidpic{
+	top: 50%;
+		left: 50%;
+		position: absolute;
+		z-index: 20; 
+		transform: translate(-50%,-50%);
+		width:70%;
+		text-align:center;
+}
+.djs_skip{
+	width: 100%;
+	position: fixed;
+	left: 0;
+	top: 0;
+	display: none;
+	height: 100%;
+	background:rgba(0,0,0,0.4);
+	z-index: 4;
+}
+.djs_skip section{
+width:50%;
+border-radius:3px;
+	position: absolute;
+	left: 50%;
+	top: 2rem;
+	-webkit-transform: -webkit-translateX(-50%);
+	transform: translateX(-50%);
+	padding: 0.5rem;
+	text-align: center;
+	background: #ffffff;
+color:#333;
+}
+
+.djs_skip span{
+color:#36ad18;
+font-weight:bold;
+}
+
+.top-download img {
+		margin-top: 2rem;
+}
+#pics{
+	text-align: center;
+}
+.xxmjm{
+	width:90%;
+	margin: 0 auto;
+	display: none;
+	padding-top:2.5rem;
+}
+.tips {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: rgba(0,0,0,0.3);
+		font-size: 0.5rem;
+}
+.tips-con {
+		width: 80%;
+		position: absolute;
+		top: 2rem;
+		left: 50%;
+		transform: translateX(-50%);
+		padding: 1rem;
+		background: rgba(0,0,0,0.3);
+		color: #fff;
+		font-size: 0.5rem;
+		border-radius: 0.3rem;
+}
+
+@media screen and (max-width: 375px){
+	.down_wrap{
+		background: url(../res/wrap2.png) no-repeat 0 1.5rem;
+		background-size: 100% 92%;
+	}
+	.lunbo{
+		height: 6.6rem;		
+		padding-top: 1.6rem;
+	}
+	.xxmjm{
+		width:90%;
+		margin: 0 auto;
+		display: none;
+		padding-top: 1.6rem;
+	}
+	.logo_xc {
+			right: 2.8rem;
+	}
+	.iospic {
+			top: 47%;
+		}
+		.androidpic {
+			width: 75%;
+	}
+		
+}
+@media screen and (width: 375px) and (height:667px){
+.down_wrap{
+		background: url(../res/wrap2.png) no-repeat 0 1.5rem;
+		background-size: 100% 105%;
+	}
+}
+@media screen and (max-width: 320px){
+	.lunbo{
+		height: 5.6rem;
+		padding-top: 1rem;
+	}
+	.xxmjm{
+		width:90%;
+		margin: 0 auto;
+		display: none;
+		padding-top: 1.2rem;
+	}
+	.down_wrap{
+		display: inline-block;
+		width: 100%;
+		height: 100%;
+		background: url(../res/wrap2.png) no-repeat 0 1.5rem ;
+		background-size: 100% 115%;
+	}
+	.safeTip{
+		bottom:-0.1rem;
+	}
+	.logo_xc {
+			
+			top: 0.15rem;
+	}
+}
+/*@media screen and (min-width: 414px){
+	.logo {
+			margin-top: 1rem;
+	}
+	.lunbo{
+		height: 7rem;		
+		padding-top: 5.5rem;
+	}
+	.down_wrap{
+		background: url(../res/wrap2.png) no-repeat 0 1.5rem ;
+		background-size: 100% 90%;
+	}
+}*/
+	/*7plus*/
+@media screen and (min-width: 414px){
+	.logo {
+			margin-top: 1rem;
+	}
+	.lunbo{
+		height: 6.6rem;		
+		padding-top: 1.5rem;
+	}
+	.xxmjm{
+		width:90%;
+		margin: 0 auto;
+		display: none;
+		padding-top: 1.5rem;
+	}
+	.down_wrap{
+		background: url(../res/wrap2.png) no-repeat 0 1.5rem ;
+		background-size: 100% 100%;
+	}
+	.iospic {
+			top: 44%;
+		}
+}
+/*大屏幕*/
+@media screen and (min-width: 768px){
+	.game-enter .game-content .top-download span {
+			font-size: 2.5rem;
+			background: url(../res/arrows.png) 98% 10% no-repeat;
+			background-size: 19% 23%;
+			line-height: 16rem;
+	}
+	.game-enter {
+		position: relative;
+		height: 970px;
+	}
+	.top-download img {
+			margin-top: 1.2rem;
+	}
+	h4{font-size: 0.5rem;}
+	.down_wrap{
+		background: url(../res/wrap2.png) no-repeat 0 1.5rem ;
+		background-size: 100% 97%;
+		border: 1px solid #ccc;
+	}
+	.logo{
+		width: 2rem!important;
+		height: 2rem!important;
+	}
+	
+	.logo_xc{
+		top: 0.15rem;
+			right: 35%;
+	}
+	.lunbo{
+		height: 10rem;		
+		padding-top: 2.5rem;
+	}
+	.xxmjm{
+		width:90%;
+		margin: 0 auto;
+		display: none;
+		padding-top: 2.5rem;
+	}
+	
+}
