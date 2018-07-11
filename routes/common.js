@@ -19,7 +19,7 @@ common.encodeSearchParams = function(obj) {
 }
 
 common.getClientIp = function(req) {
-  return req.headers['x-forwarded-for'] ||  
+  return req.headers['x-forwarded-for'].replace("::ffff:","") ||  
   req.connection.remoteAddress ||  
   req.socket.remoteAddress ||  
   req.connection.socket.remoteAddress;  
