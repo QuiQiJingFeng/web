@@ -19,10 +19,12 @@ common.encodeSearchParams = function(obj) {
 }
 
 common.getClientIp = function(req) {
-  return req.headers['x-forwarded-for'].replace("::ffff:","") ||  
+  let ip = req.headers['x-forwarded-for']||  
   req.connection.remoteAddress ||  
   req.socket.remoteAddress ||  
   req.connection.socket.remoteAddress;  
+  let newip = ip.replace("::ffff:","") 
+  return newip;
 }
 
 common.getNowFormatTime = function() {
