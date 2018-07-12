@@ -51,6 +51,10 @@ router.post('/login', function(req, res) {
     let user_ip = common.getClientIp(req);
     let user_name = req.body.user_name || account;
     let user_pic = req.body.user_pic || "";
+    let unionid = req.body.unionid;
+    let adress = req.body.adress || "";
+    let sex = req.body.sex;
+
 
     let response = {result:"success"};
     res.setHeader('Content-Type', 'application/json');
@@ -78,6 +82,7 @@ router.post('/login', function(req, res) {
                 let info = {
                     user_id:data.user_id,user_ip:user_ip,account:account,
                     login_type:login_type,platform:platform,device_id:device_id,
+                    adress:adress
                     device_type:device_type,time:now
                 };
                 mysql_pool.Insert("login",info,function(err,rows){
@@ -178,7 +183,9 @@ router.post('/login', function(req, res) {
                                 user_name:user_name,
                                 user_pic:user_pic,
                                 user_ip:user_ip,
-                                gold_num:0
+                                gold_num:100,
+                                adress:adress,
+                                sex:sex
                             };
                             //初始化用户的信息
                             mysql_pool.Insert("user_info",user_info,function(err, value) {
