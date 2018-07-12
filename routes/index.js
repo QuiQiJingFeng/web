@@ -53,7 +53,7 @@ router.post('/login', function(req, res) {
     let user_pic = req.body.user_pic || "";
     let unionid = req.body.unionid;
     let adress = req.body.adress || "";
-    let sex = req.body.sex;
+    let sex = req.body.sex || 0;
 
 
     let response = {result:"success"};
