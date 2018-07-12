@@ -82,7 +82,7 @@ router.post('/login', function(req, res) {
                 let info = {
                     user_id:data.user_id,user_ip:user_ip,account:account,
                     login_type:login_type,platform:platform,device_id:device_id,
-                    adress:adress
+                    adress:adress,
                     device_type:device_type,time:now
                 };
                 mysql_pool.Insert("login",info,function(err,rows){
