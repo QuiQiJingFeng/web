@@ -68,7 +68,7 @@ router.post('/login', function(req, res) {
         if(!phone) return;
         if(!code) return;
         //如果是app2登录  不需要初始化用户的信息,因为只用作后台操作
-        let filter = util.format("`phone_number` = %s and `register_code` = %d and `is_check` = 1 ",phone,code);
+        let filter = util.format("`phone_number` = '%s' and `register_code` = %d and `is_check` = 1 ",phone,code);
         mysql_pool.Select("register",filter, function(err,rows){
             if(err){ 
                 console.log(err);
@@ -562,7 +562,7 @@ router.post('/operator/bind_phone',function(req,res){
     }
     code = parseInt(code)
     let response = {result:"success"}
-    mysql_pool.Insert("register",{user_id:user_id,phone_number:phone,register_code:code,is_check:0},function(err, rows,error_code){
+    mysql_pool.Insert("register",{user_id:user_id,phone_number:phone,register_code:code},function(err, rows,error_code){
         if(err){
             response.result = "internal_error";
             response.error_code = error_code;
