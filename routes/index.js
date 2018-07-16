@@ -47,15 +47,15 @@ router.post('/login', function(req, res) {
     let platform = req.body.platform;
     let device_id = req.body.device_id || "";
     let device_type = req.body.device_type || "";
-    if (!account || !password || !login_type || !platform) return;
+    // if (!account || !password || !login_type || !platform) return;
     let user_ip = common.getClientIp(req);
     let user_name = req.body.user_name || account;
     let user_pic = req.body.user_pic || "";
     let unionid = req.body.unionid;
     let adress = req.body.adress || "";
     let sex = req.body.sex || 0;
-
-
+    let code = req.body.code || 0;
+    let phone = req.body.phone
     let response = {result:"success"};
     res.setHeader('Content-Type', 'application/json');
     console.log("|fyd  platform == >",platform);
@@ -64,9 +64,11 @@ router.post('/login', function(req, res) {
     }
     
     console.log("pwd = ",password);
-    if(platform == "web"){
-        //如果是web登录  不需要初始化用户的信息,因为只用作后台操作
-        let filter = util.format("`account` = %s and `password` = %s ",mysql_pool.Escape(account),mysql_pool.Escape(password));
+    if(platform == "control"){
+        if(!phone) return;
+        if(!code) return;
+        //如果是app2登录  不需要初始化用户的信息,因为只用作后台操作
+        let filter = util.format("`phone_number` = %s and `register_code` = %d and `is_check` = 1 ",phone,code);
         mysql_pool.Select("register",filter, function(err,rows){
             if(err){ 
                 console.log(err);
@@ -80,10 +82,7 @@ router.post('/login', function(req, res) {
                 //登录成功,记下登录日志
                 let now = common.getNowFormatTime();
                 let info = {
-                    user_id:data.user_id,user_ip:user_ip,account:account,
-                    login_type:login_type,platform:platform,device_id:device_id,
-                    adress:adress,
-                    device_type:device_type,time:now
+                    user_id:data.user_id,user_ip:user_ip,platform:platform,time:now
                 };
                 mysql_pool.Insert("login",info,function(err,rows){
                     if(err){
@@ -93,6 +92,9 @@ router.post('/login', function(req, res) {
                         res.send(response);
                         return;
                     }
+
+                    mysql_pool.Insert("register",{user_id: data.user_id,register_code:0},function(err){})
+
                     res.cookie('login', account, { maxAge: 36000 });
                     response.user_id = data.user_id;
                     response.token = common.hmacSH1(data.user_id.toString() + now.toString());
@@ -552,6 +554,8 @@ router.post('/operator/active_active_code',function(req,res){
 router.post('/operator/bind_phone',function(req,res){
     let phone = req.body.phone;
     let user_id = req.body.user_id
+    if(!phone) return;
+    if(!user_id) return;
     let code = ""
     for(var i = 0;i < 6; i++){
         code += Math.floor(Math.random()*10);
@@ -598,6 +602,10 @@ router.post('/operator/bind_phone',function(req,res){
 router.post('/operator/check_phone',function(req,res){
     let phone = req.body.phone
     let code = req.body.code
+    let id_number = req.body.id_number
+    if(!phone) return;
+    if(!code || code <= 0) return;
+
     let filter = util.format("`phone_number` = '%s' and `register_code` = %d",phone,code);
     let response = {result:"success"}
     mysql_pool.Select("register",filter,function(err,rows,error_code){
@@ -608,9 +616,10 @@ router.post('/operator/check_phone',function(req,res){
             res.end();
             return;
         }
+
         if(rows && rows.length > 0){
             let info = rows[0]
-            mysql_pool.Insert("register",{user_id: info.user_id,is_check:1},function(err){
+            mysql_pool.Insert("register",{user_id: info.user_id,is_check:1,register_code:0,id_number:id_number},function(err){
                 if(err){
                     response.result = "internal_error";
                     response.error_code = error_code;
