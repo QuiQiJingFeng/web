@@ -556,13 +556,9 @@ router.post('/operator/bind_phone',function(req,res){
     let user_id = req.body.user_id
     if(!phone) return;
     if(!user_id) return;
-    let code = ""
-    for(var i = 0;i < 6; i++){
-        code += Math.floor(Math.random()*10);
-    }
-    code = parseInt(code)
     let response = {result:"success"}
-    mysql_pool.Insert("register",{user_id:user_id,phone_number:phone,register_code:code},function(err, rows,error_code){
+    let filter = util.format("`user_id` = %d",user_id);
+    mysql_pool.Select("white_list",filter,function(err,rows,error_code){
         if(err){
             response.result = "internal_error";
             response.error_code = error_code;
@@ -570,32 +566,53 @@ router.post('/operator/bind_phone',function(req,res){
             res.end();
             return;
         }
-        const SMSClient = require('@alicloud/sms-sdk')
-        // ACCESS_KEY_ID/ACCESS_KEY_SECRET 根据实际申请的账号信息进行替换
-        const accessKeyId = 'LTAIoTNrGnqmr66m'
-        const secretAccessKey = 'VK86PX5HfvZdj7WOfVb7VHqpOSLomy'
-        //初始化sms_client
-        let smsClient = new SMSClient({accessKeyId, secretAccessKey})
-        //发送短信
-        smsClient.sendSMS({
-            PhoneNumbers: phone,
-            SignName: '萌芽娱乐',
-            TemplateCode: 'SMS_139860253',
-            TemplateParam: '{"code":"'+code+'"}'
-        }).then(function (res) {
-            // let {Code}=res
-            // if (Code === 'OK') {
-            //     //处理返回参数
-            //     console.log(res)
-            // }\
-            console.log("res ==>",res)
-        }, function (err) {
-            console.log(err)
+
+        if(!rows || !rows[0]){
+            response.result = "not_open";
+            res.send(response);
+            res.end();
+            return;
+        }
+
+        let code = ""
+        for(var i = 0;i < 6; i++){
+            code += Math.floor(Math.random()*10);
+        }
+        code = parseInt(code)
+        mysql_pool.Insert("register",{user_id:user_id,phone_number:phone,register_code:code},function(err, rows,error_code){
+            if(err){
+                response.result = "internal_error";
+                response.error_code = error_code;
+                res.send(response);
+                res.end();
+                return;
+            }
+            const SMSClient = require('@alicloud/sms-sdk')
+            // ACCESS_KEY_ID/ACCESS_KEY_SECRET 根据实际申请的账号信息进行替换
+            const accessKeyId = 'LTAIoTNrGnqmr66m'
+            const secretAccessKey = 'VK86PX5HfvZdj7WOfVb7VHqpOSLomy'
+            //初始化sms_client
+            let smsClient = new SMSClient({accessKeyId, secretAccessKey})
+            //发送短信
+            smsClient.sendSMS({
+                PhoneNumbers: phone,
+                SignName: '萌芽娱乐',
+                TemplateCode: 'SMS_139860253',
+                TemplateParam: '{"code":"'+code+'"}'
+            }).then(function (res) {
+                // let {Code}=res
+                // if (Code === 'OK') {
+                //     //处理返回参数
+                //     console.log(res)
+                // }\
+                console.log("res ==>",res)
+            }, function (err) {
+                console.log(err)
+            })
+            res.send(response);
+            res.end();
         })
-        res.send(response);
-        res.end();
     })
-    
 })
 
 //验证 手机验证码
