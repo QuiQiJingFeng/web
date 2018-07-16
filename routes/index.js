@@ -603,6 +603,8 @@ router.post('/operator/check_phone',function(req,res){
     let phone = req.body.phone
     let code = req.body.code
     let id_number = req.body.id_number
+    let user_name = req.body.user_name or ""
+    user_name = mysql_pool.Escape(user_name)
     if(!phone) return;
     if(!code || code <= 0) return;
 
@@ -619,7 +621,7 @@ router.post('/operator/check_phone',function(req,res){
 
         if(rows && rows.length > 0){
             let info = rows[0]
-            mysql_pool.Insert("register",{user_id: info.user_id,is_check:1,register_code:0,id_number:id_number},function(err){
+            mysql_pool.Insert("register",{user_id: info.user_id,is_check:1,register_code:0,id_number:id_number,user_name:user_name},function(err){
                 if(err){
                     response.result = "internal_error";
                     response.error_code = error_code;
