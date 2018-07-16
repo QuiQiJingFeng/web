@@ -603,7 +603,7 @@ router.post('/operator/check_phone',function(req,res){
     let phone = req.body.phone
     let code = req.body.code
     let id_number = req.body.id_number
-    let user_name = req.body.user_name or ""
+    let user_name = req.body.user_name || ""
     user_name = mysql_pool.Escape(user_name)
     if(!phone) return;
     if(!code || code <= 0) return;
