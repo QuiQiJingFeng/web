@@ -216,3 +216,40 @@ exports.SearchProxyByLevel = function(user_id,level){
         call_back(rows.affectedRows == 1)
     });
 }
+
+
+exports.SendGoldToOther = function(user_id,other_id,send_num,call_back){
+    let query1 = `start transaction;`
+    let query2 = `update user_info set gold_num=gold_num+${send_num} where user_id=${other_id};`
+    let query3 = `update user_info set gold_num=gold_num-${send_num} where user_id=${user_id};`
+    let query4 = `commit;`
+    let querys = [query1,query2,query3,query4];
+    for (var i = 0;i<4;i++) {
+        let query = querys[i]
+        mysql_pool.query(query, function(err, rows, fileds) {
+            let error_code
+            if(err) {
+                console.log(err);
+                error_code = constant.ERROR_CODE["90001"];
+                call_back(err, rows, error_code);
+                return;
+            };
+        });
+    }
+    call_back();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

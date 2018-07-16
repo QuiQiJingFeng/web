@@ -658,7 +658,45 @@ router.post('/operator/check_phone',function(req,res){
     })
 })
 
+// 赠送用户金币
+router.post('/operator/send_gold',function(req,res){
+    let send_num = req.body.send_num
+    let user_id = req.body.user_id
+    let send_id = req.body.send_id
+    if(!send_num || !send_id || !user_id) return;
+    console.log("1111111111")
+    let response = {result:"success"}
+    let filter = util.format("`user_id` = %d and `gold_num` >= %d",user_id,send_num);
+    console.log("filter = ",filter)
+    mysql_pool.Select("user_info",filter,function(err,rows,error_code){
+        if(err){
+            response.result = "internal_error";
+            response.error_code = error_code;
+            res.send(response);
+            res.end();
+            return;
+        }
+        if(!(rows && rows.length > 0)){
+            response.result = "gold_not_enough";
+            res.send(response);
+            res.end();
+            return;
+        }
+        //如果金币数量满足赠送要求
+        mysql_pool.SendGoldToOther(user_id,send_id,send_num,function(err, rows, error_code){
+            if(err){
+                response.result = "internal_error";
+                response.error_code = error_code;
+                res.send(response);
+                res.end();
+                return;
+            }
+            res.send(response);
+            res.end();
+        })
+    })
 
+})
  
 
 
