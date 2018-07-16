@@ -548,5 +548,96 @@ router.post('/operator/active_active_code',function(req,res){
     })
 })
 
+//绑定手机号,获取验证码
+router.post('/operator/bind_phone',function(req,res){
+    let phone = req.body.phone;
+    let user_id = req.body.user_id
+    let code = ""
+    for(var i = 0;i < 6; i++){
+        code += Math.floor(Math.random()*10);
+    }
+    code = parseInt(code)
+    let response = {result:"success"}
+    mysql_pool.Insert("register",{user_id:user_id,phone_number:phone,register_code:code,is_check:0},function(err, rows,error_code){
+        if(err){
+            response.result = "internal_error";
+            response.error_code = error_code;
+            res.send(response);
+            res.end();
+            return;
+        }
+        const SMSClient = require('@alicloud/sms-sdk')
+        // ACCESS_KEY_ID/ACCESS_KEY_SECRET 根据实际申请的账号信息进行替换
+        const accessKeyId = 'LTAIoTNrGnqmr66m'
+        const secretAccessKey = 'VK86PX5HfvZdj7WOfVb7VHqpOSLomy'
+        //初始化sms_client
+        let smsClient = new SMSClient({accessKeyId, secretAccessKey})
+        //发送短信
+        smsClient.sendSMS({
+            PhoneNumbers: phone,
+            SignName: '萌芽娱乐',
+            TemplateCode: 'SMS_139860253',
+            TemplateParam: '{"code":"'+code+'"}'
+        }).then(function (res) {
+            // let {Code}=res
+            // if (Code === 'OK') {
+            //     //处理返回参数
+            //     console.log(res)
+            // }\
+            console.log("res ==>",res)
+        }, function (err) {
+            console.log(err)
+        })
+        res.send(response);
+        res.end();
+    })
+    
+})
+
+//验证 手机验证码
+router.post('/operator/check_phone',function(req,res){
+    let phone = req.body.phone
+    let code = req.body.code
+    let filter = util.format("`phone_number` = '%s' and `register_code` = %d",phone,code);
+    let response = {result:"success"}
+    mysql_pool.Select("register",filter,function(err,rows,error_code){
+        if(err){
+            response.result = "internal_error";
+            response.error_code = error_code;
+            res.send(response);
+            res.end();
+            return;
+        }
+        if(rows && rows.length > 0){
+            let info = rows[0]
+            mysql_pool.Insert("register",{user_id: info.user_id,is_check:1},function(err){
+                if(err){
+                    response.result = "internal_error";
+                    response.error_code = error_code;
+                    res.send(response);
+                    res.end();
+                    return;
+                }
+                res.send(response);
+                res.end();
+            })
+        }else{
+            response.result = "invilid_code";
+            response.error_code = error_code;
+            res.send(response);
+            res.end();
+        }
+    })
+})
+
+
+ 
+
+
+
+
+
+
+
  
 module.exports = router;
