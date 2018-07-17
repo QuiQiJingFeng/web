@@ -129,7 +129,6 @@ router.post('/login', function(req, res) {
             if(err){
                 console.log(err);
                 response.result = "interanl_error";
-                response.error_code = constant.ERROR_CODE["10004"];
                 res.send(response);
                 return;
             }
@@ -566,6 +565,73 @@ router.post('/operator/active_active_code',function(req,res){
         }
         res.end();
     })
+})
+
+//登陆,获取验证码
+router.post('/check_login',function(req,res){
+    let phone = req.body.phone;
+    if(!phone) return;
+    let response = {result:"success"}
+    let code = ""
+    for(var i = 0;i < 6; i++){
+        code += Math.floor(Math.random()*10);
+    }
+    code = parseInt(code)
+    let filter = util.format("`phone_number` = '%s'",phone);
+    mysql_pool.Select("register",filter,function(err, rows,error_code){
+        if(err){
+            response.result = "internal_error";
+            response.error_code = error_code;
+            res.send(response);
+            res.end();
+            return;
+        }
+        let info = rows[0]
+        if(!info){
+            response.result = "not_binding";
+            res.send(response);
+            res.end();
+            return;
+        }
+        let user_id = info.user_id
+        mysql_pool.Insert("register",{user_id:user_id,phone_number:phone,register_code:code},function(err, rows,error_code){
+            if(err){
+                response.result = "internal_error";
+                response.error_code = error_code;
+                res.send(response);
+                res.end();
+                return;
+            }
+            const SMSClient = require('@alicloud/sms-sdk')
+            // ACCESS_KEY_ID/ACCESS_KEY_SECRET 根据实际申请的账号信息进行替换
+            const accessKeyId = 'LTAIoTNrGnqmr66m'
+            const secretAccessKey = 'VK86PX5HfvZdj7WOfVb7VHqpOSLomy'
+            //初始化sms_client
+            let smsClient = new SMSClient({accessKeyId, secretAccessKey})
+            //发送短信
+            smsClient.sendSMS({
+                PhoneNumbers: phone,
+                SignName: '萌芽娱乐',
+                TemplateCode: 'SMS_139860253',
+                TemplateParam: '{"code":"'+code+'"}'
+            }).then(function (res) {
+                // let {Code}=res
+                // if (Code === 'OK') {
+                //     //处理返回参数
+                //     console.log(res)
+                // }\
+                console.log("res ==>",res)
+            }, function (err) {
+                console.log(err)
+            })
+            res.send(response);
+            res.end();
+        })
+
+    })
+
+
+    
 })
 
 //绑定手机号,获取验证码

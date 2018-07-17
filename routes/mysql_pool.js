@@ -1,6 +1,7 @@
 var mysql = require('mysql');
 var util = require('util');
 var common = require("./common.js")
+let constant = require("./constant.js");
 var mysql_pool = mysql.createPool({
     host:     '127.0.0.1',
     user:     "root",
