@@ -129,6 +129,7 @@ router.post('/login', function(req, res) {
             if(err){
                 console.log(err);
                 response.result = "interanl_error";
+                response.error_code = constant.ERROR_CODE["10004"];
                 res.send(response);
                 return;
             }
