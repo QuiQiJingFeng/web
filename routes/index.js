@@ -687,7 +687,7 @@ router.post('/operator/bind_phone',function(req,res){
         smsClient.sendSMS({
             PhoneNumbers: phone,
             SignName: '萌芽娱乐',
-            TemplateCode: 'SMS_139860253',
+            TemplateCode: 'SMS_139930125',
             TemplateParam: '{"code":"'+code+'"}'
         }).then(function (res) {
             // let {Code}=res
@@ -753,10 +753,8 @@ router.post('/operator/send_gold',function(req,res){
     let user_id = req.body.user_id
     let send_id = req.body.send_id
     if(!send_num || !send_id || !user_id) return;
-    console.log("1111111111")
     let response = {result:"success"}
     let filter = util.format("`user_id` = %d and `gold_num` >= %d",user_id,send_num);
-    console.log("filter = ",filter)
     mysql_pool.Select("user_info",filter,function(err,rows,error_code){
         if(err){
             response.result = "internal_error";
@@ -783,6 +781,27 @@ router.post('/operator/send_gold',function(req,res){
             res.send(response);
             res.end();
         })
+    })
+})
+
+
+// 更新经纬度
+router.post('/operator/update_gps',function(req,res){
+    let user_id = req.body.user_id
+    let latitude = req.body.latitude
+    let lontitude = req.body.lontitude
+    if(!latitude || !lontitude || !user_id) return;
+    let response = {result:"success"}
+    mysql_pool.Insert("user_info",{user_id:user_id,latitude:latitude,lontitude:lontitude},function(err,rows,error_code){
+        if(err){
+            response.result = "internal_error";
+            response.error_code = error_code;
+            res.send(response);
+            res.end();
+            return;
+        }
+        res.send(response);
+        res.end();
     })
 })
  
