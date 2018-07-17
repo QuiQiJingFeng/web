@@ -218,13 +218,13 @@ exports.SearchProxyByLevel = function(user_id,level){
     });
 }
 
-
 exports.SendGoldToOther = function(user_id,other_id,send_num,call_back){
     let query1 = `start transaction;`
     let query2 = `update user_info set gold_num=gold_num+${send_num} where user_id=${other_id};`
     let query3 = `update user_info set gold_num=gold_num-${send_num} where user_id=${user_id};`
-    let query4 = `commit;`
-    let querys = [query1,query2,query3,query4];
+    let query4 = `insert into resource (user_id,resource_type,source,num,arg1) values(${other_id},1,4,${send_num},'${user_id}');`
+    let query5 = `commit;`
+    let querys = [query1,query2,query3,query4,query5];
     for (var i = 0;i<4;i++) {
         let query = querys[i]
         mysql_pool.query(query, function(err, rows, fileds) {
