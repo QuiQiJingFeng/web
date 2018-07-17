@@ -67,43 +67,61 @@ router.post('/login', function(req, res) {
     if(platform == "control"){
         if(!phone) return;
         if(!code) return;
-        //如果是app2登录  不需要初始化用户的信息,因为只用作后台操作
-        let filter = util.format("`phone_number` = '%s' and `register_code` = %d and `is_check` = 1 ",phone,code);
-        mysql_pool.Select("register",filter, function(err,rows){
-            if(err){ 
-                console.log(err);
-                response.result = "interanl_error";
-                response.error_code = constant.ERROR_CODE["10003"];
+        let filt = util.format("`user_id` = %d",user_id);
+        mysql_pool.Select("white_list",filt,function(err,rows,error_code){
+            if(err){
+                response.result = "internal_error";
+                response.error_code = error_code;
                 res.send(response);
+                res.end();
                 return;
             }
-            let data = rows[0];
-            if(data){
-                //登录成功,记下登录日志
-                let now = common.getNowFormatTime();
-                let info = {
-                    user_id:data.user_id,user_ip:user_ip,platform:platform,time:now
-                };
-                mysql_pool.Insert("login",info,function(err,rows){
-                    if(err){
-                        console.log(err);
-                        response.result = "interanl_error";
-                        response.error_code = constant.ERROR_CODE["10005"];
-                        res.send(response);
-                        return;
-                    }
 
-                    mysql_pool.Insert("register",{user_id: data.user_id,register_code:0},function(err){})
-
-                    res.cookie('login', account, { maxAge: 36000 });
-                    response.user_id = data.user_id;
-                    response.token = common.hmacSH1(data.user_id.toString() + now.toString());
-                    res.send(response);
-                });
-            }else{
-                response.result = "register_first";
+            if(!rows || !rows[0]){
+                response.result = "not_open";
                 res.send(response);
+                res.end();
+                return;
             }
+
+            //如果是app2登录  不需要初始化用户的信息,因为只用作后台操作
+            let filter = util.format("`phone_number` = '%s' and `register_code` = %d and `is_check` = 1 ",phone,code);
+            mysql_pool.Select("register",filter, function(err,rows){
+                if(err){ 
+                    console.log(err);
+                    response.result = "interanl_error";
+                    response.error_code = constant.ERROR_CODE["10003"];
+                    res.send(response);
+                    return;
+                }
+                let data = rows[0];
+                if(data){
+                    //登录成功,记下登录日志
+                    let now = common.getNowFormatTime();
+                    let info = {
+                        user_id:data.user_id,user_ip:user_ip,platform:platform,time:now
+                    };
+                    mysql_pool.Insert("login",info,function(err,rows){
+                        if(err){
+                            console.log(err);
+                            response.result = "interanl_error";
+                            response.error_code = constant.ERROR_CODE["10005"];
+                            res.send(response);
+                            return;
+                        }
+
+                        mysql_pool.Insert("register",{user_id: data.user_id,register_code:0},function(err){})
+
+                        res.cookie('login', account, { maxAge: 36000 });
+                        response.user_id = data.user_id;
+                        response.token = common.hmacSH1(data.user_id.toString() + now.toString());
+                        res.send(response);
+                    });
+                }else{
+                    response.result = "register_first";
+                    res.send(response);
+                }
+            });
         });
     }else{
         //如果是平台登录
@@ -557,8 +575,12 @@ router.post('/operator/bind_phone',function(req,res){
     if(!phone) return;
     if(!user_id) return;
     let response = {result:"success"}
-    let filter = util.format("`user_id` = %d",user_id);
-    mysql_pool.Select("white_list",filter,function(err,rows,error_code){
+    let code = ""
+    for(var i = 0;i < 6; i++){
+        code += Math.floor(Math.random()*10);
+    }
+    code = parseInt(code)
+    mysql_pool.Insert("register",{user_id:user_id,phone_number:phone,register_code:code},function(err, rows,error_code){
         if(err){
             response.result = "internal_error";
             response.error_code = error_code;
@@ -566,52 +588,30 @@ router.post('/operator/bind_phone',function(req,res){
             res.end();
             return;
         }
-
-        if(!rows || !rows[0]){
-            response.result = "not_open";
-            res.send(response);
-            res.end();
-            return;
-        }
-
-        let code = ""
-        for(var i = 0;i < 6; i++){
-            code += Math.floor(Math.random()*10);
-        }
-        code = parseInt(code)
-        mysql_pool.Insert("register",{user_id:user_id,phone_number:phone,register_code:code},function(err, rows,error_code){
-            if(err){
-                response.result = "internal_error";
-                response.error_code = error_code;
-                res.send(response);
-                res.end();
-                return;
-            }
-            const SMSClient = require('@alicloud/sms-sdk')
-            // ACCESS_KEY_ID/ACCESS_KEY_SECRET 根据实际申请的账号信息进行替换
-            const accessKeyId = 'LTAIoTNrGnqmr66m'
-            const secretAccessKey = 'VK86PX5HfvZdj7WOfVb7VHqpOSLomy'
-            //初始化sms_client
-            let smsClient = new SMSClient({accessKeyId, secretAccessKey})
-            //发送短信
-            smsClient.sendSMS({
-                PhoneNumbers: phone,
-                SignName: '萌芽娱乐',
-                TemplateCode: 'SMS_139860253',
-                TemplateParam: '{"code":"'+code+'"}'
-            }).then(function (res) {
-                // let {Code}=res
-                // if (Code === 'OK') {
-                //     //处理返回参数
-                //     console.log(res)
-                // }\
-                console.log("res ==>",res)
-            }, function (err) {
-                console.log(err)
-            })
-            res.send(response);
-            res.end();
+        const SMSClient = require('@alicloud/sms-sdk')
+        // ACCESS_KEY_ID/ACCESS_KEY_SECRET 根据实际申请的账号信息进行替换
+        const accessKeyId = 'LTAIoTNrGnqmr66m'
+        const secretAccessKey = 'VK86PX5HfvZdj7WOfVb7VHqpOSLomy'
+        //初始化sms_client
+        let smsClient = new SMSClient({accessKeyId, secretAccessKey})
+        //发送短信
+        smsClient.sendSMS({
+            PhoneNumbers: phone,
+            SignName: '萌芽娱乐',
+            TemplateCode: 'SMS_139860253',
+            TemplateParam: '{"code":"'+code+'"}'
+        }).then(function (res) {
+            // let {Code}=res
+            // if (Code === 'OK') {
+            //     //处理返回参数
+            //     console.log(res)
+            // }\
+            console.log("res ==>",res)
+        }, function (err) {
+            console.log(err)
         })
+        res.send(response);
+        res.end();
     })
 })
 
@@ -695,7 +695,6 @@ router.post('/operator/send_gold',function(req,res){
             res.end();
         })
     })
-
 })
  
 
