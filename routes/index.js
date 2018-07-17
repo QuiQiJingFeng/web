@@ -372,27 +372,49 @@ router.post('/operator/get_room_list',function(req,res){
 router.post('/operator/get_user_info',function(req,res){
     let user_id = req.body.user_id;
     let response = {result : "success"};
-    let filter = util.format("`user_id` = %s ",mysql_pool.Escape(user_id));
-    mysql_pool.Select("user_info",filter,function(err,rows,error_code){
-        if(err){
-            response.result = "internal_error";
-            response.error_code = error_code;
+
+    let filt = util.format("`user_id` = %d and `is_check` = 1 ",user_id);
+    mysql_pool.Select("register",filt, function(err,rows){
+        if(err){ 
+            console.log(err);
+            response.result = "interanl_error";
+            response.error_code = constant.ERROR_CODE["10003"];
             res.send(response);
-            res.end();
             return;
         }
-        let info = rows[0];
-        if(info){
-            for(let key in info){
-                response[key] = info[key];
-            }
-            res.send(response);
+        let data = rows[0];
+        if(!data){
+            response["is_check"] = false;
         }else{
-            response.result = "not_select_info";
-            res.send(response);
+            response["is_check"] = true;
         }
-        res.end();
+
+        let filter = util.format("`user_id` = %s ",mysql_pool.Escape(user_id));
+        mysql_pool.Select("user_info",filter,function(err,rows,error_code){
+            if(err){
+                response.result = "internal_error";
+                response.error_code = error_code;
+                res.send(response);
+                res.end();
+                return;
+            }
+            let info = rows[0];
+            if(info){
+                for(let key in info){
+                    response[key] = info[key];
+                }
+                res.send(response);
+            }else{
+                response.result = "not_select_info";
+                res.send(response);
+            }
+            res.end();
+        });
+
     });
+
+
+    
 })
 
 router.post('/operator/get_server_list_by_type',function(req,res){
