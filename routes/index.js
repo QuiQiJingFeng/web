@@ -755,8 +755,8 @@ router.post('/operator/send_gold',function(req,res){
     if(!send_num || !send_id || !user_id) return;
     let response = {result:"success"}
 
-    let filt = util.format("`user_id` = %d",send_id);
-    mysql_pool.Select("register",filt,function(err,rows,error_code){
+    let filter = util.format("`user_id` = %d",user_id)
+    mysql_pool.Select("user_info",filter,function(err,rows,error_code){
         if(err){
             response.result = "internal_error";
             response.error_code = error_code;
@@ -765,14 +765,23 @@ router.post('/operator/send_gold',function(req,res){
             return;
         }
         if(!(rows && rows.length > 0)){
-            response.result = "send_id_not_exist";
+            response.result = "user_id_error";
             res.send(response);
             res.end();
             return;
         }
 
-        let filter2 = util.format("`phone_number` <> '%s' and `user_id` = %d",user_id);
-        mysql_pool.Select("register",filter2,function(err,rows,error_code){
+        let info = rows[0];
+        if(info.gold_num < send_num){
+            response.result = "gold_not_enough";
+            res.send(response);
+            res.end();
+            return;
+        }
+
+
+        let filter1 = util.format("`user_id` = %d and `phone_number` <> ''",user_id)
+        mysql_pool.Select("register",filter1,function(err,rows,error_code){
             if(err){
                 response.result = "internal_error";
                 response.error_code = error_code;
@@ -786,8 +795,11 @@ router.post('/operator/send_gold',function(req,res){
                 res.end();
                 return;
             }
-            let filter = util.format("`user_id` = %d and `gold_num` >= %d",user_id,send_num);
-            mysql_pool.Select("user_info",filter,function(err,rows,error_code){
+
+            let info = rows[0];
+            let phone_number = info.phone_number
+            let filt = util.format("`phone` = '%s'",phone_number);
+            mysql_pool.Select("white_list",filt,function(err,rows,error_code){
                 if(err){
                     response.result = "internal_error";
                     response.error_code = error_code;
@@ -795,8 +807,9 @@ router.post('/operator/send_gold',function(req,res){
                     res.end();
                     return;
                 }
-                if(!(rows && rows.length > 0)){
-                    response.result = "gold_not_enough";
+
+                if(!rows || !rows[0]){
+                    response.result = "not_open";
                     res.send(response);
                     res.end();
                     return;
@@ -816,8 +829,6 @@ router.post('/operator/send_gold',function(req,res){
             })
         })
     })
-
-    
 })
 
 
