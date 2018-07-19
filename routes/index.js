@@ -754,8 +754,9 @@ router.post('/operator/send_gold',function(req,res){
     let send_id = req.body.send_id
     if(!send_num || !send_id || !user_id) return;
     let response = {result:"success"}
+
     let filt = util.format("`user_id` = %d",send_id);
-    mysql_pool.Select("user_info",filt,function(err,rows,error_code){
+    mysql_pool.Select("register",filt,function(err,rows,error_code){
         if(err){
             response.result = "internal_error";
             response.error_code = error_code;
@@ -769,8 +770,9 @@ router.post('/operator/send_gold',function(req,res){
             res.end();
             return;
         }
-        let filter = util.format("`user_id` = %d and `gold_num` >= %d",user_id,send_num);
-        mysql_pool.Select("user_info",filter,function(err,rows,error_code){
+
+        let filter2 = util.format("`phone_number` <> '%s' and `user_id` = %d",user_id);
+        mysql_pool.Select("register",filter2,function(err,rows,error_code){
             if(err){
                 response.result = "internal_error";
                 response.error_code = error_code;
@@ -779,13 +781,13 @@ router.post('/operator/send_gold',function(req,res){
                 return;
             }
             if(!(rows && rows.length > 0)){
-                response.result = "gold_not_enough";
+                response.result = "not_binding";
                 res.send(response);
                 res.end();
                 return;
             }
-            //如果金币数量满足赠送要求
-            mysql_pool.SendGoldToOther(user_id,send_id,send_num,function(err, rows, error_code){
+            let filter = util.format("`user_id` = %d and `gold_num` >= %d",user_id,send_num);
+            mysql_pool.Select("user_info",filter,function(err,rows,error_code){
                 if(err){
                     response.result = "internal_error";
                     response.error_code = error_code;
@@ -793,8 +795,24 @@ router.post('/operator/send_gold',function(req,res){
                     res.end();
                     return;
                 }
-                res.send(response);
-                res.end();
+                if(!(rows && rows.length > 0)){
+                    response.result = "gold_not_enough";
+                    res.send(response);
+                    res.end();
+                    return;
+                }
+                //如果金币数量满足赠送要求
+                mysql_pool.SendGoldToOther(user_id,send_id,send_num,function(err, rows, error_code){
+                    if(err){
+                        response.result = "internal_error";
+                        response.error_code = error_code;
+                        res.send(response);
+                        res.end();
+                        return;
+                    }
+                    res.send(response);
+                    res.end();
+                })
             })
         })
     })
