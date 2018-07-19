@@ -67,7 +67,7 @@ router.post('/login', function(req, res) {
     if(platform == "control"){
         if(!phone) return;
         if(!code) return;
-        let filt = util.format("`user_id` = %d",user_id);
+        let filt = util.format("`phone` = %d",phone);
         mysql_pool.Select("white_list",filt,function(err,rows,error_code){
             if(err){
                 response.result = "internal_error";
