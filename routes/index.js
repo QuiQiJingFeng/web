@@ -417,6 +417,96 @@ router.post('/operator/get_user_info',function(req,res){
     
 })
 
+router.post('/operator/get_other_info',function(req,res){
+    let user_id = req.body.user_id;
+    let other_id = req.body.other_id;
+
+    let response = {result : "success"};
+    if(typeof(other_id) != "number" || typeof(user_id) != "number"){
+        response.result = "param_error";
+        res.send(response);
+        res.end();
+        return;
+    };
+
+    let filter1 = util.format("`user_id` = %d and `phone_number` <> ''",user_id)
+    mysql_pool.Select("register",filter1,function(err,rows,error_code){
+        if(err){
+            response.result = "internal_error";
+            response.error_code = error_code;
+            res.send(response);
+            res.end();
+            return;
+        }
+        if(!(rows && rows.length > 0)){
+            response.result = "not_binding";
+            res.send(response);
+            res.end();
+            return;
+        }
+
+        let info = rows[0];
+        let phone_number = info.phone_number
+        let filt = util.format("`phone` = '%s'",phone_number);
+        mysql_pool.Select("white_list",filt,function(err,rows,error_code){
+            if(err){
+                response.result = "internal_error";
+                response.error_code = error_code;
+                res.send(response);
+                res.end();
+                return;
+            }
+
+            if(!rows || !rows[0]){
+                response.result = "not_open";
+                res.send(response);
+                res.end();
+                return;
+            }
+
+            let filt = util.format("`user_id` = %d and `is_check` = 1 ",user_id);
+            mysql_pool.Select("register",filt, function(err,rows){
+                if(err){ 
+                    console.log(err);
+                    response.result = "interanl_error";
+                    response.error_code = constant.ERROR_CODE["10003"];
+                    res.send(response);
+                    return;
+                }
+                let data = rows[0];
+                if(!data){
+                    response["is_check"] = false;
+                }else{
+                    response["is_check"] = true;
+                }
+
+                let filter = util.format("`user_id` = %s ",mysql_pool.Escape(user_id));
+                mysql_pool.Select("user_info",filter,function(err,rows,error_code){
+                    if(err){
+                        response.result = "internal_error";
+                        response.error_code = error_code;
+                        res.send(response);
+                        res.end();
+                        return;
+                    }
+                    let info = rows[0];
+                    if(info){
+                        for(let key in info){
+                            response[key] = info[key];
+                        }
+                        res.send(response);
+                    }else{
+                        response.result = "not_select_info";
+                        res.send(response);
+                    }
+                    res.end();
+                });
+
+            });
+        })
+    })
+})
+
 router.post('/operator/get_server_list_by_type',function(req,res){
     let game_type = req.body.game_type;
     let response = {result : "success"};
