@@ -480,7 +480,7 @@ router.post('/operator/get_other_info',function(req,res){
                     response["is_check"] = true;
                 }
 
-                let filter = util.format("`user_id` = %s ",mysql_pool.Escape(user_id));
+                let filter = util.format("`user_id` = %s ",mysql_pool.Escape(other_id));
                 mysql_pool.Select("user_info",filter,function(err,rows,error_code){
                     if(err){
                         response.result = "internal_error";
