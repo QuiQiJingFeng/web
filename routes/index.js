@@ -422,7 +422,7 @@ router.post('/operator/get_other_info',function(req,res){
     let other_id = req.body.other_id;
 
     let response = {result : "success"};
-    if(typeof(other_id) != "number" || typeof(user_id) != "number"){
+    if(!user_id || !other_id){
         response.result = "param_error";
         res.send(response);
         res.end();
@@ -843,7 +843,7 @@ router.post('/operator/send_gold',function(req,res){
     let user_id = req.body.user_id
     let send_id = req.body.send_id
     let response = {result:"success"}
-    if(typeof(send_num) != "number" || typeof(send_id) != "number" || typeof(user_id) != "number"){
+    if(!send_num || !send_id || !user_id){
         response.result = "param_error";
         res.send(response);
         res.end();
@@ -851,7 +851,7 @@ router.post('/operator/send_gold',function(req,res){
     };
     
 
-    if(send_num <= 0 || user_id == send_id){
+    if(+send_num <= 0 || user_id == send_id){
         response.result = "param_error";
         res.send(response);
         res.end();
