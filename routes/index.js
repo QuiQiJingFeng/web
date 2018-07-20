@@ -752,8 +752,15 @@ router.post('/operator/send_gold',function(req,res){
     let send_num = req.body.send_num
     let user_id = req.body.user_id
     let send_id = req.body.send_id
-    if(!send_num || !send_id || !user_id) return;
+    if(typeof(send_num) != "number" || typeof(send_id) != "number" || typeof(user_id) != "number") return;
     let response = {result:"success"}
+
+    if(send_num <= 0 || user_id == send_id){
+        response.result = "param_error";
+        res.send(response);
+        res.end();
+        return;
+    }
 
     let filter = util.format("`user_id` = %d",user_id)
     mysql_pool.Select("user_info",filter,function(err,rows,error_code){
