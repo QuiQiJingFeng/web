@@ -68,7 +68,7 @@ app.use(function(err, req, res, next) {
   res.send("ERROR");
 });
 
-http.createServer(app).listen(80);
-https.createServer(options, app).listen(443);
+// http.createServer(app).listen(80);
+// https.createServer(options, app).listen(443);
 
 module.exports = app;
