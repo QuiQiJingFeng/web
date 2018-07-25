@@ -108,13 +108,6 @@ common.hmacSH1 = function(content){
   return hmac.digest('hex');
 }
 
-
-
-
-
-
-
-
 module.exports = common;
 
 

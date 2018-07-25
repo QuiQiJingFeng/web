@@ -5,12 +5,38 @@ let accountcheck = require('./accountcheck');
 let common = require('./common');
 let async = require('async');
 
+router.route('/')
+    .get(function(req, res) {
+        
+        if (req.cookies.login) {
+            res.redirect('/index');
+        } else {
+            res.redirect('/login');
+        }
+    });
+//登录界面
+router.get('/login', function(req, res){
+    res.setHeader('Content-Type', 'text/html');
+    res.sendfile("./views/login.html");
+});
+
+//主界面
+router.get('/index', function(req, res){
+    res.setHeader('Content-Type', 'text/html');
+    if (!req.cookies.login) {
+        res.redirect('/login');
+    }else{
+        res.sendfile("./views/index.html");
+    }
+});
+
 /*
     @account  账户
     @password 密码
     @recommend 推荐码
 */
 router.post('/register', function(req, res) {
+    res.setHeader('Content-Type', 'application/json');
     let account = req.body.account;
     let password = req.body.password;
     let recommond = req.body.recommond
@@ -29,6 +55,7 @@ router.post('/register', function(req, res) {
 });
 
 router.post('/login',function(req,res){
+    res.setHeader('Content-Type', 'application/json');
     let account = req.body.account;
     let password = req.body.password;
     let response = {code:errorcode["SUCCESS"]};
@@ -40,12 +67,38 @@ router.post('/login',function(req,res){
     password = common.hmacSH1(password);
     accountcheck.LoginByAccoutAndPassword(account,password,function(err,data){
         if(err){ console.log(err); res.send({code:err}); return;}
+
+        res.cookie('login', account, { maxAge: 36000000 });
+
+        if(data){response.data = data}
+        res.send(response);
+    })
+})
+
+//重置密码
+router.post('/forget',function(req,res){
+    res.setHeader('Content-Type', 'application/json');
+    let account = req.body.account;
+    let password = req.body.password;
+    let recommond = req.body.recommond;
+
+    let response = {code:errorcode["SUCCESS"]};
+    if(!account || !password || !recommond){
+        response.code = errorcode["INVALID_PARAMATER"]
+        res.send(response)
+        return;
+    }
+    password = common.hmacSH1(password);
+    
+    accountcheck.ResetPassword(account,password,recommond,function(err,data){
+        if(err){ console.log(err); res.send({code:err}); return;}
         if(data){response.data = data}
         res.send(response);
     })
 })
 
 router.use('/operator/*', function (req, res, next) {
+    res.setHeader('Content-Type', 'application/json');
     let body = req.body;
     let token = body.token;
     accountcheck.GetRegInfoByToken(token,function(err,data){
@@ -97,6 +150,25 @@ router.post('/operator/select_special_info',function(req,res){
         res.send(response);
     })
 })
+
+//查询可用的推荐码 需要二级以上的权限
+router.post('/operator/get_useable_recommand',function(req,res){
+    let token = req.body.token
+    let minLevel = 1
+    let num = req.body.num
+    let response = {code:errorcode["SUCCESS"]};
+    if(!token ||!num){
+        response.code = errorcode["INVALID_PARAMATER"]
+        res.send(response)
+        return;
+    }
+    accountcheck.GetRecommondInfo(token,minLevel,num,function(err,data){
+        if(err){ console.log(err); res.send({code:err}); return;}
+        if(data){response.data = data}
+        res.send(response);
+    })
+})
+
 
  
 module.exports = router;

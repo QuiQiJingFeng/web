@@ -7,18 +7,14 @@ let common = require('./common');
 //1、检查推荐码是否可用
 let isInvilidRecommond = function(data,callBack){
     let recommond = data.recommond
-    console.log("111111111")
     assert(recommond,"recommond == null")
     
     database.IsExistRecommond(recommond,function(err,rows,fileds){
-        console.log("2222222222")
         if(err){ callBack(errorcode["SQL_ERROR"]); return;}
         let info = rows[0];
         if(!info){
-            console.log("333333333333")
             callBack(errorcode["INVALID_RECOMMAND"]); return;
         }
-        console.log("444444444444")
         callBack(null,data);
     })
 }
@@ -45,6 +41,15 @@ let registerAccount = function(data,callBack){
 
     database.RegisterAccount(account,password,recommond,function(err, rows, fileds){
         if(err){ callBack(errorcode["SQL_ERROR"]); return;}
+        callBack(null,data);
+    });
+}
+
+// 标记推荐码被使用过了
+let markRecommond = function(data,callBack){
+    let recommond = data.recommond;
+    database.MarkRecommond(recommond,function(err, rows, fileds){
+        if(err){ callBack(errorcode["SQL_ERROR"]); return;}
         callBack(null,null);
     });
 }
@@ -54,7 +59,7 @@ exports.RegisterByRecommond = function(account,password,recommond,callBack){
     data.password = password;
     data.recommond = recommond;
     
-    let process = async.compose(registerAccount,isRegisterAccount,isInvilidRecommond)
+    let process = async.compose(markRecommond,registerAccount,isRegisterAccount,isInvilidRecommond)
     process(data,callBack);
 }
 
@@ -175,4 +180,85 @@ exports.GetSpecialUserInfo = function(user_id,callBack){
         callBack(null,body);
     })
 }
- 
+
+//检测账号和推荐码是否匹配
+let checkAccountAndRecommond = function(data,callBack){
+    let account = data.account
+    let recommond = data.recommond
+    database.SelectInfoByAccountAndRecommond(account,recommond,function(err, rows, fileds){
+        if(err){ callBack(errorcode["SQL_ERROR"]); return;}
+        
+        let info = rows[0]
+        if(!info){callBack(errorcode["INVALID_RECOMMAND_OR_ACCOUNT"]); return;}
+        callBack(null,data);
+    })
+}
+
+let updatePassword = function(data,callBack){
+    let account = data.account
+    let password = data.password
+    database.UpdatePassword(account,password,function(err, rows, fileds){
+        if(err){ callBack(errorcode["SQL_ERROR"]); return;}
+        callBack(null,null);
+    })
+}
+
+exports.ResetPassword = function(account,password,recommond,callBack){
+    let data = {}
+    data.account = account;
+    data.password = password;
+    data.recommond = recommond;
+    let process = async.compose(updatePassword,checkAccountAndRecommond)
+    process(data,callBack);
+}
+
+//检查用户的权限
+let checkUserLevel = function(data,callBack){
+    let token = data.token
+    let minLevel = data.minLevel
+    database.CheckUserLevel(token,minLevel,function(err, rows, fileds){
+        if(err){ callBack(errorcode["SQL_ERROR"]); return;}
+        let info = rows[0]
+        if(!info){callBack(errorcode["LOW_LEVEL"]); return;}
+        callBack(null,data);
+    })
+}
+
+//可用推荐码的总数量
+let getNumUseAbleRecommond = function(data,callBack){
+    database.GetNumUseAbleRecommond(function(err, rows, fileds){
+        if(err){ callBack(errorcode["SQL_ERROR"]); return;}
+        let info = rows[0]
+        if(info.count <= 0){
+            callBack(errorcode["LOW_LEVEL"]); return;
+        }
+        data.total = info.count;
+        callBack(null,data);
+    })
+}
+
+//获取可用的推荐码
+let getUseAbleRecommond = function(data,callBack){
+    let num = data.num; //推荐码的数量
+    database.GetUseAbleRecommond(num,function(err, rows, fileds){
+        if(err){ callBack(errorcode["SQL_ERROR"]); return;}
+        let body = {}
+        let list = []
+        for(let i=0;i<rows.length;i++){
+            list.push(rows[i].code);
+        }
+        body.list = list
+        body.total = data.total;
+        callBack(null,body);
+    })
+}
+
+//获取推荐码信息
+exports.GetRecommondInfo = function(token,minLevel,num,callBack){
+    let data = {}
+    data.token = token;
+    data.minLevel = minLevel;
+    data.num = num;
+    let process = async.compose(getUseAbleRecommond,getNumUseAbleRecommond,checkUserLevel)
+    process(data,callBack);
+}

@@ -42,7 +42,7 @@ app.use(function (req, res, next) {
     // to the API (e.g. in case you use sessions)
     res.setHeader('Access-Control-Allow-Credentials', true);
 
-    res.setHeader('Content-Type', 'application/json');
+    
 
     // Pass to next layer of middleware
     next();
@@ -70,7 +70,8 @@ app.use(function(err, req, res, next) {
   res.send("ERROR");
 });
 
-http.createServer(app).listen(2018);
+process.env.PORT = 2018
+// http.createServer(app).listen(2018);
 // https.createServer(options, app).listen(443);
 
 module.exports = app;

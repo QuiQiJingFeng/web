@@ -6,7 +6,7 @@ CREATE TABLE console_register
 (
     account         varchar(255),            -- 玩家的账户
     password        varchar(200),            -- 玩家的密码 MD5 (平台的登陆因为需要向平台去验证,所以这里不需要存储)
-    recommend       varchar(20),             -- 推荐码
+    recommond       varchar(20),             -- 推荐码
     level           int default 1,           -- 用户权限
     gold            double default 0,        -- 金币余额
     time            datetime,                -- 注册的时间

@@ -19,6 +19,9 @@ errorcode["INVALID_TOKEN"] = 10006;
 errorcode["GOLD_NOT_ENOUGH"] = 10007;
 //user_id 不存在
 errorcode["USER_ID_NOT_EXIST"] = 10008;
-
+//账户或者推荐码错误
+errorcode["INVALID_RECOMMAND_OR_ACCOUNT"] = 10009;
+//权限不足
+errorcode["LOW_LEVEL"] = 10010;
 
 module.exports = errorcode;
