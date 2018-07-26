@@ -96,12 +96,12 @@ router.post('/forget',function(req,res){
     })
 })
 
-router.use('/operator/*', function (req, res, next) {
+router.use('/operator', function (req, res, next) {
     res.setHeader('Content-Type', 'application/json');
     let body = req.body;
     let token = body.token;
     accountcheck.GetRegInfoByToken(token,function(err,data){
-        if(err){ console.log(err); res.send({code:err}); return;}
+        if(err){ console.log(err); res.send({code:err}); res.end(); return;}
         req.body["_info_"] = data;
         next();
     })
@@ -167,6 +167,7 @@ router.post('/operator/get_useable_recommand',function(req,res){
         res.send(response);
     })
 })
+
 
 router.post('/operator/get_info',function(req,res){
     let response = {code:errorcode["SUCCESS"]};
