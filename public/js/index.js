@@ -72,9 +72,28 @@ function RegisterNavEvent(element){
 }
 
 function InitUserInfo(){
-  console.log($("#gold").text());
-  $("#gold").text(getCookieValue("gold"));
-  $("#level").text(getCookieValue("level"));
+  let token = getCookieValue("token")
+  console.log("token = ",token)
+  $.ajax({
+    type: 'POST',
+    url: "operator/get_info",
+    data: {"token":token},
+    success: function(msg){
+      if(msg.code != 0){
+          alert(ERROR_CODE[msg.code])
+          return;
+      }
+      $("#gold").text(msg.data.gold);
+      $("#level").text(msg.data.level);
+    },
+    error:function (status) {//请求失败后调用的函数
+      layer.open({
+        title: '配置获取失败'
+        ,content: status
+      });
+    }
+  });
+
 }
 
 layui.use('element', function(){

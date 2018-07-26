@@ -56,6 +56,17 @@ exports.SelectAccountAndPassword = function(account,password,callBack){
     });
 }
 
+exports.SelectInfoByToken = function(token,callBack){
+    account = mysql.escape(account)
+    password = mysql.escape(password)
+    token = mysql.escape(token)
+    let query = `SELECT * FROM console_register WHERE token = ${token}`;
+    db.query(query, function(err, rows, fileds) {
+        if(err) console.log(err);
+        callBack(err, rows, fileds);
+    });
+}
+
 exports.InsertLogin = function(account,callBack){
     account = mysql.escape(account)
     let query = `INSERT INTO console_login (account,time) VALUES(${account},NOW())`

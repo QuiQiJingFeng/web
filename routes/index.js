@@ -168,6 +168,17 @@ router.post('/operator/get_useable_recommand',function(req,res){
     })
 })
 
+router.post('/operator/get_info',function(req,res){
+    let token = req.body.token
+    let response = {code:errorcode["SUCCESS"]};
+    let data ={}
+    data.gold = req.body["_info_"].gold;
+    data.level = req.body["_info_"].level;
+    
+    response.data = data
+    res.send(response);
+})
+
 
  
 module.exports = router;

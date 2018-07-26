@@ -162,9 +162,7 @@
 							content:ERROR_CODE[msg.code]
 							});
 		        	}else{
-						setCookie("token", msg.data.token, 10)
-						setCookie("gold", msg.data.gold, 10)
-						setCookie("level", msg.data.level, 10)
+						setCookie("token", msg.data.token, "")
 
 		        		window.location = "/";
 		        	}
