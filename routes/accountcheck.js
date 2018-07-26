@@ -148,7 +148,9 @@ let updateGoldToUser = function(data,callBack){
 
     database.SendGoldToUser(account,user_id,send_num,pre_gold,function(err, rows, fileds){
         if(err){ callBack(errorcode["SQL_ERROR"]); return;}
-        callBack(null,null);
+        let body = {}
+        body.gold = pre_gold - send_num
+        callBack(null,body);
     })
 }
 

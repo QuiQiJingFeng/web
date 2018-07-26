@@ -7,7 +7,6 @@ let async = require('async');
 
 router.route('/')
     .get(function(req, res) {
-        
         if (req.cookies.login) {
             res.redirect('/index');
         } else {
@@ -110,8 +109,8 @@ router.use('/operator/*', function (req, res, next) {
 
 router.post('/operator/send_gold',function(req,res){
     let info = req.body["_info_"]
-    let send_num = req.body.send_num
-    let user_id = req.body.user_id
+    let send_num = Number(req.body.send_num)
+    let user_id = Number(req.body.user_id)
     let response = {code:errorcode["SUCCESS"]};
     if(!send_num || !user_id){
         response.code = errorcode["INVALID_PARAMATER"]
@@ -137,7 +136,7 @@ router.post('/operator/send_gold',function(req,res){
 })
 
 router.post('/operator/select_special_info',function(req,res){
-    let user_id = req.body.user_id
+    let user_id = Number(req.body.user_id)
     let response = {code:errorcode["SUCCESS"]};
     if(!user_id){
         response.code = errorcode["INVALID_PARAMATER"]
@@ -154,8 +153,8 @@ router.post('/operator/select_special_info',function(req,res){
 //查询可用的推荐码 需要二级以上的权限
 router.post('/operator/get_useable_recommand',function(req,res){
     let token = req.body.token
-    let minLevel = 1
-    let num = req.body.num
+    let minLevel = 2
+    let num = Number(req.body.num)
     let response = {code:errorcode["SUCCESS"]};
     if(!token ||!num){
         response.code = errorcode["INVALID_PARAMATER"]

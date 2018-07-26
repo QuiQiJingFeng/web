@@ -1,0 +1,12 @@
+@CHARSET "UTF-8";
+.pt {
+	position: absolute;
+	text-align:left;
+	background: none repeat scroll 0 0 #FFFFFF;
+    border: 1px solid #CFCFCF;
+    box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.1);
+	z-index: 2209;
+	width: auto;
+	height:auto;
+	display:none;
+}

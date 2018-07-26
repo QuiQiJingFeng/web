@@ -30,6 +30,7 @@ function getCookieValue(name) {
 } 
 
 var ERROR_CODE = {}
+ERROR_CODE[0] = "执行成功"
 ERROR_CODE[10002] = "注册码不正确"
 ERROR_CODE[10003] = "账号已经注册"
 ERROR_CODE[10004] = "参数错误"
@@ -38,6 +39,7 @@ ERROR_CODE[10006] = "登录TOKEN错误"
 ERROR_CODE[10007] = "金币不足"
 ERROR_CODE[10008] = "ID 不存在"
 ERROR_CODE[10009] = "账户或者推荐码错误"
+ERROR_CODE[10010] = "权限不足"
 
 
 
